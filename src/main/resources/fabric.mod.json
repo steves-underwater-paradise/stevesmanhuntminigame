@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "MODNAME",
+  "version": "${version}",
+  "name": "MODNAME_PRETTY",
+  "description": "DESCRIPTION",
+  "authors": [
+    "AUTHOR"
+  ],
+  "license": "LICENSE",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "PACKAGE.MODCLASS"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.16.9",
+    "fabric-api": "*",
+    "minecraft": ">=1.21.4",
+    "plasmid": ">=0.6.2"
+  }
+}
