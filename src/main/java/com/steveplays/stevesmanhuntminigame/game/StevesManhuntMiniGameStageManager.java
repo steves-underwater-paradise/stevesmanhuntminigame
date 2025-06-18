@@ -1,11 +1,10 @@
-package org.example.MODNAME.game;
+package com.steveplays.stevesmanhuntminigame.game;
 
 import com.google.common.collect.ImmutableSet;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.entity.player.PlayerPosition;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 import xyz.nucleoid.plasmid.api.game.GameSpace;
 import xyz.nucleoid.plasmid.api.game.player.PlayerSet;
@@ -18,18 +17,18 @@ import net.minecraft.world.GameMode;
 
 import java.util.Set;
 
-public class MODCLASSStageManager {
+public class StevesManhuntMiniGameStageManager {
     private long closeTime = -1;
     public long finishTime = -1;
     private long startTime = -1;
     private final Object2ObjectMap<ServerPlayerEntity, FrozenPlayer> frozen;
     private boolean setSpectator = false;
 
-    public MODCLASSStageManager() {
+    public StevesManhuntMiniGameStageManager() {
         this.frozen = new Object2ObjectOpenHashMap<>();
     }
 
-    public void onOpen(long time, MODCLASSConfig config) {
+    public void onOpen(long time, StevesManhuntMiniGameConfig config) {
         this.startTime = time - (time % 20) + (4 * 20) + 19;
         this.finishTime = this.startTime + (config.timeLimitSecs() * 20);
     }
@@ -81,7 +80,8 @@ public class MODCLASSStageManager {
                     state.lastPos = player.getPos();
                 }
 
-                // Set X and Y as relative so it will send 0 change when we pass yaw (yaw - yaw = 0) and pitch
+                // Set X and Y as relative so it will send 0 change when we pass yaw (yaw - yaw
+                // = 0) and pitch
                 Set<PositionFlag> flags = ImmutableSet.of(PositionFlag.X_ROT, PositionFlag.Y_ROT);
 
                 // Teleport without changing the pitch and yaw

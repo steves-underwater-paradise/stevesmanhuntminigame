@@ -1,15 +1,14 @@
-package org.example.MODNAME.game;
+package com.steveplays.stevesmanhuntminigame.game;
 
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.Vec3d;
 import xyz.nucleoid.fantasy.RuntimeWorldConfig;
 import xyz.nucleoid.plasmid.api.game.*;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.GameMode;
-import org.example.MODNAME.game.map.MODCLASSMap;
-import org.example.MODNAME.game.map.MODCLASSMapGenerator;
+import com.steveplays.stevesmanhuntminigame.game.map.StevesManhuntMiniGameMap;
+import com.steveplays.stevesmanhuntminigame.game.map.StevesManhuntMiniGameMapGenerator;
 import xyz.nucleoid.plasmid.api.game.common.GameWaitingLobby;
 import xyz.nucleoid.plasmid.api.game.event.GameActivityEvents;
 import xyz.nucleoid.plasmid.api.game.event.GamePlayerEvents;
@@ -17,31 +16,33 @@ import xyz.nucleoid.plasmid.api.game.player.JoinOffer;
 import xyz.nucleoid.stimuli.event.EventResult;
 import xyz.nucleoid.stimuli.event.player.PlayerDeathEvent;
 
-public class MODCLASSWaiting {
+public class StevesManhuntMiniGameWaiting {
     private final GameSpace gameSpace;
-    private final MODCLASSMap map;
-    private final MODCLASSConfig config;
-    private final MODCLASSSpawnLogic spawnLogic;
+    private final StevesManhuntMiniGameMap map;
+    private final StevesManhuntMiniGameConfig config;
+    private final StevesManhuntMiniGameSpawnLogic spawnLogic;
     private final ServerWorld world;
 
-    private MODCLASSWaiting(GameSpace gameSpace, ServerWorld world, MODCLASSMap map, MODCLASSConfig config) {
+    private StevesManhuntMiniGameWaiting(GameSpace gameSpace, ServerWorld world, StevesManhuntMiniGameMap map,
+            StevesManhuntMiniGameConfig config) {
         this.gameSpace = gameSpace;
         this.map = map;
         this.config = config;
         this.world = world;
-        this.spawnLogic = new MODCLASSSpawnLogic(gameSpace, world, map);
+        this.spawnLogic = new StevesManhuntMiniGameSpawnLogic(gameSpace, world, map);
     }
 
-    public static GameOpenProcedure open(GameOpenContext<MODCLASSConfig> context) {
-        MODCLASSConfig config = context.config();
-        MODCLASSMapGenerator generator = new MODCLASSMapGenerator(config.mapConfig());
-        MODCLASSMap map = generator.build();
+    public static GameOpenProcedure open(GameOpenContext<StevesManhuntMiniGameConfig> context) {
+        StevesManhuntMiniGameConfig config = context.config();
+        StevesManhuntMiniGameMapGenerator generator = new StevesManhuntMiniGameMapGenerator(config.mapConfig());
+        StevesManhuntMiniGameMap map = generator.build();
 
         RuntimeWorldConfig worldConfig = new RuntimeWorldConfig()
                 .setGenerator(map.asGenerator(context.server()));
 
         return context.openWithWorld(worldConfig, (game, world) -> {
-            MODCLASSWaiting waiting = new MODCLASSWaiting(game.getGameSpace(), world, map, context.config());
+            StevesManhuntMiniGameWaiting waiting = new StevesManhuntMiniGameWaiting(game.getGameSpace(), world, map,
+                    context.config());
 
             GameWaitingLobby.addTo(game, config.players());
 
@@ -54,7 +55,7 @@ public class MODCLASSWaiting {
     }
 
     private GameResult requestStart() {
-        MODCLASSActive.open(this.gameSpace, this.world, this.map, this.config);
+        StevesManhuntMiniGameActive.open(this.gameSpace, this.world, this.map, this.config);
         return GameResult.ok();
     }
 

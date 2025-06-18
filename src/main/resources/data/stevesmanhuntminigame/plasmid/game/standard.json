@@ -1,5 +1,5 @@
 {
-  "type": "MODNAME:MODNAME",
+  "type": "stevesmanhuntminigame:stevesmanhuntminigame",
   "map": {
     "spawn_block": {
       "Name": "minecraft:red_terracotta",

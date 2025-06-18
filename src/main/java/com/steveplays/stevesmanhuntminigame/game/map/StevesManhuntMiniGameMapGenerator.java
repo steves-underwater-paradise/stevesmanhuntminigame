@@ -1,19 +1,19 @@
-package org.example.MODNAME.game.map;
+package com.steveplays.stevesmanhuntminigame.game.map;
 
 import xyz.nucleoid.map_templates.MapTemplate;
 import net.minecraft.util.math.BlockPos;
 
-public class MODCLASSMapGenerator {
+public class StevesManhuntMiniGameMapGenerator {
 
-    private final MODCLASSMapConfig config;
+    private final StevesManhuntMiniGameMapConfig config;
 
-    public MODCLASSMapGenerator(MODCLASSMapConfig config) {
+    public StevesManhuntMiniGameMapGenerator(StevesManhuntMiniGameMapConfig config) {
         this.config = config;
     }
 
-    public MODCLASSMap build() {
+    public StevesManhuntMiniGameMap build() {
         MapTemplate template = MapTemplate.createEmpty();
-        MODCLASSMap map = new MODCLASSMap(template, this.config);
+        StevesManhuntMiniGameMap map = new StevesManhuntMiniGameMap(template, this.config);
 
         this.buildSpawn(template);
         map.spawn = new BlockPos(0,65,0);

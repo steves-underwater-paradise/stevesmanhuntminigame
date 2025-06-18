@@ -1,14 +1,14 @@
-package org.example.MODNAME.game;
+package com.steveplays.stevesmanhuntminigame.game;
 
 import net.minecraft.entity.boss.BossBar;
 import net.minecraft.text.Text;
 import xyz.nucleoid.plasmid.api.game.common.GlobalWidgets;
 import xyz.nucleoid.plasmid.api.game.common.widget.BossBarWidget;
 
-public final class MODCLASSTimerBar {
+public final class StevesManhuntMiniGameTimerBar {
     private final BossBarWidget widget;
 
-    public MODCLASSTimerBar(GlobalWidgets widgets) {
+    public StevesManhuntMiniGameTimerBar(GlobalWidgets widgets) {
         Text title = Text.literal("Waiting for the game to start...");
         this.widget = widgets.addBossBar(title, BossBar.Color.GREEN, BossBar.Style.NOTCHED_10);
     }

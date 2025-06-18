@@ -1,4 +1,4 @@
-package org.example.MODNAME.game;
+package com.steveplays.stevesmanhuntminigame.game;
 
 import net.minecraft.util.math.Vec3d;
 import xyz.nucleoid.plasmid.api.game.GameSpace;
@@ -9,17 +9,17 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.GameMode;
-import org.example.MODNAME.MODCLASS;
-import org.example.MODNAME.game.map.MODCLASSMap;
+import com.steveplays.stevesmanhuntminigame.StevesManhuntMiniGame;
+import com.steveplays.stevesmanhuntminigame.game.map.StevesManhuntMiniGameMap;
 
 import java.util.Set;
 
-public class MODCLASSSpawnLogic {
+public class StevesManhuntMiniGameSpawnLogic {
     private final GameSpace gameSpace;
-    private final MODCLASSMap map;
+    private final StevesManhuntMiniGameMap map;
     private final ServerWorld world;
 
-    public MODCLASSSpawnLogic(GameSpace gameSpace, ServerWorld world, MODCLASSMap map) {
+    public StevesManhuntMiniGameSpawnLogic(GameSpace gameSpace, ServerWorld world, StevesManhuntMiniGameMap map) {
         this.gameSpace = gameSpace;
         this.map = map;
         this.world = world;
@@ -35,14 +35,13 @@ public class MODCLASSSpawnLogic {
                 20 * 60 * 60,
                 1,
                 true,
-                false
-        ));
+                false));
     }
 
     public void spawnPlayer(ServerPlayerEntity player) {
         BlockPos pos = this.map.spawn;
         if (pos == null) {
-            MODCLASS.LOGGER.error("Cannot spawn player! No spawn is defined in the map!");
+            StevesManhuntMiniGame.LOGGER.error("Cannot spawn player! No spawn is defined in the map!");
             return;
         }
 

@@ -1,17 +1,17 @@
 {
   "schemaVersion": 1,
-  "id": "MODNAME",
+  "id": "stevesmanhuntminigame",
   "version": "${version}",
-  "name": "MODNAME_PRETTY",
-  "description": "DESCRIPTION",
+  "name": "StevesManhuntMiniGame",
+  "description": "Adds a manhunt mini-game using Plasmid.",
   "authors": [
-    "AUTHOR"
+    "Steveplays28"
   ],
-  "license": "LICENSE",
+  "license": "LGPLv3",
   "environment": "*",
   "entrypoints": {
     "main": [
-      "PACKAGE.MODCLASS"
+      "com.steveplays.stevesmanhuntminigame.StevesManhuntMiniGame"
     ]
   },
   "depends": {

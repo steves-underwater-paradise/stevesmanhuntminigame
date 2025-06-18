@@ -1,4 +1,4 @@
-package org.example.MODNAME.game;
+package com.steveplays.stevesmanhuntminigame.game;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -20,7 +20,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.GameMode;
-import org.example.MODNAME.game.map.MODCLASSMap;
+import com.steveplays.stevesmanhuntminigame.game.map.StevesManhuntMiniGameMap;
 import xyz.nucleoid.stimuli.event.EventResult;
 import xyz.nucleoid.stimuli.event.player.PlayerDamageEvent;
 import xyz.nucleoid.stimuli.event.player.PlayerDeathEvent;
@@ -28,43 +28,46 @@ import xyz.nucleoid.stimuli.event.player.PlayerDeathEvent;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class MODCLASSActive {
-    private final MODCLASSConfig config;
+public class StevesManhuntMiniGameActive {
+    private final StevesManhuntMiniGameConfig config;
 
     public final GameSpace gameSpace;
-    private final MODCLASSMap gameMap;
+    private final StevesManhuntMiniGameMap gameMap;
 
-    private final Object2ObjectMap<PlayerRef, MODCLASSPlayer> participants;
-    private final MODCLASSSpawnLogic spawnLogic;
-    private final MODCLASSStageManager stageManager;
+    private final Object2ObjectMap<PlayerRef, StevesManhuntMiniGamePlayer> participants;
+    private final StevesManhuntMiniGameSpawnLogic spawnLogic;
+    private final StevesManhuntMiniGameStageManager stageManager;
     private final boolean ignoreWinState;
-    private final MODCLASSTimerBar timerBar;
+    private final StevesManhuntMiniGameTimerBar timerBar;
     private final ServerWorld world;
 
-    private MODCLASSActive(GameSpace gameSpace, ServerWorld world, MODCLASSMap map, GlobalWidgets widgets, MODCLASSConfig config, Set<PlayerRef> participants) {
+    private StevesManhuntMiniGameActive(GameSpace gameSpace, ServerWorld world, StevesManhuntMiniGameMap map,
+            GlobalWidgets widgets, StevesManhuntMiniGameConfig config, Set<PlayerRef> participants) {
         this.gameSpace = gameSpace;
         this.config = config;
         this.gameMap = map;
-        this.spawnLogic = new MODCLASSSpawnLogic(gameSpace, world, map);
+        this.spawnLogic = new StevesManhuntMiniGameSpawnLogic(gameSpace, world, map);
         this.participants = new Object2ObjectOpenHashMap<>();
         this.world = world;
 
         for (PlayerRef player : participants) {
-            this.participants.put(player, new MODCLASSPlayer());
+            this.participants.put(player, new StevesManhuntMiniGamePlayer());
         }
 
-        this.stageManager = new MODCLASSStageManager();
+        this.stageManager = new StevesManhuntMiniGameStageManager();
         this.ignoreWinState = this.participants.size() <= 1;
-        this.timerBar = new MODCLASSTimerBar(widgets);
+        this.timerBar = new StevesManhuntMiniGameTimerBar(widgets);
     }
 
-    public static void open(GameSpace gameSpace, ServerWorld world, MODCLASSMap map, MODCLASSConfig config) {
+    public static void open(GameSpace gameSpace, ServerWorld world, StevesManhuntMiniGameMap map,
+            StevesManhuntMiniGameConfig config) {
         gameSpace.setActivity(game -> {
             Set<PlayerRef> participants = gameSpace.getPlayers().participants().stream()
                     .map(PlayerRef::of)
                     .collect(Collectors.toSet());
             GlobalWidgets widgets = GlobalWidgets.addTo(game);
-            MODCLASSActive active = new MODCLASSActive(gameSpace, world, map, widgets, config, participants);
+            StevesManhuntMiniGameActive active = new StevesManhuntMiniGameActive(gameSpace, world, map, widgets, config,
+                    participants);
 
             game.setRule(GameRuleType.CRAFTING, EventResult.DENY);
             game.setRule(GameRuleType.PORTALS, EventResult.DENY);
@@ -109,7 +112,8 @@ public class MODCLASSActive {
     }
 
     private void addPlayer(ServerPlayerEntity player) {
-        if (!this.participants.containsKey(PlayerRef.of(player)) || this.gameSpace.getPlayers().spectators().contains(player)) {
+        if (!this.participants.containsKey(PlayerRef.of(player))
+                || this.gameSpace.getPlayers().spectators().contains(player)) {
             this.spawnSpectator(player);
         }
     }
@@ -143,7 +147,7 @@ public class MODCLASSActive {
     private void tick() {
         long time = this.world.getTime();
 
-        MODCLASSStageManager.IdleTickResult result = this.stageManager.tick(time, gameSpace);
+        StevesManhuntMiniGameStageManager.IdleTickResult result = this.stageManager.tick(time, gameSpace);
 
         switch (result) {
             case CONTINUE_TICK:
