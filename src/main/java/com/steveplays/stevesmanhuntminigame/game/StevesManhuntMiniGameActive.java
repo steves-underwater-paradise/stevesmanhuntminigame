@@ -85,7 +85,6 @@ public class StevesManhuntMiniGameActive {
 
             game.listen(GameActivityEvents.TICK, active::tick);
 
-            game.listen(PlayerDamageEvent.EVENT, active::onPlayerDamage);
             game.listen(PlayerDeathEvent.EVENT, active::onPlayerDeath);
 
             game.listen(NetherPortalOpenEvent.EVENT, active::onNetherPortalOpen);
@@ -117,12 +116,6 @@ public class StevesManhuntMiniGameActive {
 
     private void removePlayer(ServerPlayerEntity player) {
         this.participants.remove(PlayerRef.of(player));
-    }
-
-    private ActionResult onPlayerDamage(ServerPlayerEntity player, DamageSource source, float amount) {
-        // TODO handle damage
-        this.spawnParticipant(player);
-        return ActionResult.CONSUME;
     }
 
     private ActionResult onPlayerDeath(ServerPlayerEntity player, DamageSource source) {
