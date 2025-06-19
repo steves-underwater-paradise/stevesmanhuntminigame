@@ -5,6 +5,8 @@ import net.minecraft.util.Formatting;
 import xyz.nucleoid.plasmid.api.game.common.GlobalWidgets;
 import xyz.nucleoid.plasmid.api.game.common.widget.SidebarWidget;
 
+import static com.steveplays.stevesmanhuntminigame.util.TickUtil.TICKS_PER_SECOND;
+
 public final class StevesManhuntMiniGameTimerBar {
     private final SidebarWidget sidebarWidget;
 
@@ -16,17 +18,17 @@ public final class StevesManhuntMiniGameTimerBar {
     }
 
     public void update(long ticksUntilEnd, long totalTicksUntilEnd) {
-        if (ticksUntilEnd % 20 != 0) {
+        if (ticksUntilEnd % TICKS_PER_SECOND != 0) {
             return;
         }
 
         // TODO: Replace literal text with translatable text
         sidebarWidget.clearLines();
-        sidebarWidget.addLines(Text.literal("Time remaining: "), this.getText(totalTicksUntilEnd));
+        sidebarWidget.addLines(Text.literal("Time remaining: ").append(this.getText(ticksUntilEnd)));
     }
 
     private Text getText(long ticksUntilEnd) {
-        long secondsUntilEnd = ticksUntilEnd / 20;
+        long secondsUntilEnd = ticksUntilEnd / TICKS_PER_SECOND;
 
         long minutes = secondsUntilEnd / 60;
         long seconds = secondsUntilEnd % 60;

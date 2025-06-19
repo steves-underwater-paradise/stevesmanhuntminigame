@@ -129,7 +129,7 @@ public class StevesManhuntMiniGameActive {
     }
 
     private void spawnParticipant(ServerPlayerEntity player) {
-        this.spawnLogic.resetPlayer(player, GameMode.ADVENTURE);
+        this.spawnLogic.resetPlayer(player, GameMode.SURVIVAL);
         this.spawnLogic.spawnPlayer(player);
     }
 
