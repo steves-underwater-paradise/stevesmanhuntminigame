@@ -76,7 +76,7 @@ public class StevesManhuntMiniGameWaiting {
     }
 
     private void spawnPlayer(ServerPlayerEntity player) {
-        this.spawnLogic.resetPlayer(player, GameMode.CREATIVE);
+        this.spawnLogic.resetPlayer(player, GameMode.ADVENTURE);
         this.spawnLogic.spawnPlayer(player);
     }
 }
