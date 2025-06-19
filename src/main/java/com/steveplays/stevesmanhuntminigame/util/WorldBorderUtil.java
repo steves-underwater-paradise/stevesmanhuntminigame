@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import com.steveplays.stevesmanhuntminigame.StevesManhuntMiniGame;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
@@ -12,7 +11,7 @@ public class WorldBorderUtil {
 	private static final @NotNull String MULTI_WORLD_BORDERS_NOT_INSTALLED_WARNING =
 			"Multi World Borders by PotatoPresident (mod ID: multiworldborders) is not installed. World borders may not be set correctly.\nDownload:\n- GitHub: https://github.com/PotatoPresident/worldborderfixer\n- Modrinth: https://modrinth.com/mod/worldborderfix\n- CurseForge: https://www.curseforge.com/minecraft/mc-mods/world-border-fix";
 
-	public static void WarnInLogIfMultiWorldBordersIsNotInstalled(@NotNull ServerWorld serverWorld) {
+	public static void WarnInLogIfMultiWorldBordersIsNotInstalled() {
 		if (IsMultiWorldBordersInstalled()) {
 			return;
 		}

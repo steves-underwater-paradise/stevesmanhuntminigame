@@ -2,6 +2,7 @@ package com.steveplays.stevesmanhuntminigame.game;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import xyz.nucleoid.plasmid.api.game.GameCloseReason;
 import xyz.nucleoid.plasmid.api.game.GameSpace;
@@ -12,7 +13,9 @@ import xyz.nucleoid.plasmid.api.game.player.JoinOffer;
 import xyz.nucleoid.plasmid.api.game.player.PlayerSet;
 import xyz.nucleoid.plasmid.api.game.rule.GameRuleType;
 import xyz.nucleoid.plasmid.api.util.PlayerRef;
+import net.minecraft.block.pattern.BlockPattern.Result;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.item.ItemUsageContext;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
@@ -21,33 +24,38 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.GameMode;
 import com.steveplays.stevesmanhuntminigame.game.map.StevesManhuntMiniGameMap;
-import xyz.nucleoid.stimuli.event.EventResult;
 import xyz.nucleoid.stimuli.event.player.PlayerDamageEvent;
 import xyz.nucleoid.stimuli.event.player.PlayerDeathEvent;
+import xyz.nucleoid.stimuli.event.world.EndPortalOpenEvent;
+import xyz.nucleoid.stimuli.event.world.NetherPortalOpenEvent;
 import static com.steveplays.stevesmanhuntminigame.util.TickUtil.TICKS_PER_SECOND;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class StevesManhuntMiniGameActive {
-    private final StevesManhuntMiniGameConfig config;
-
     public final GameSpace gameSpace;
-    private final StevesManhuntMiniGameMap gameMap;
 
+    private final StevesManhuntMiniGameConfig config;
+    private final StevesManhuntMiniGameMap gameMap;
     private final Object2ObjectMap<PlayerRef, StevesManhuntMiniGamePlayer> participants;
     private final StevesManhuntMiniGameSpawnLogic spawnLogic;
     private final StevesManhuntMiniGameStageManager stageManager;
     private final boolean ignoreWinState;
     private final StevesManhuntMiniGameTimerBar timerBar;
-    private final ServerWorld world;
+    private final ServerWorld overworld;
+    private final ServerWorld nether;
+    private final ServerWorld end;
 
-    private StevesManhuntMiniGameActive(GameSpace gameSpace, ServerWorld world, StevesManhuntMiniGameMap map, GlobalWidgets widgets, StevesManhuntMiniGameConfig config, Set<PlayerRef> participants) {
+    private StevesManhuntMiniGameActive(GameSpace gameSpace, ServerWorld overworld, ServerWorld nether, ServerWorld end, StevesManhuntMiniGameMap map, GlobalWidgets widgets,
+            StevesManhuntMiniGameConfig config, Set<PlayerRef> participants) {
         this.gameSpace = gameSpace;
         this.config = config;
         this.gameMap = map;
-        this.spawnLogic = new StevesManhuntMiniGameSpawnLogic(gameSpace, world, map);
+        this.spawnLogic = new StevesManhuntMiniGameSpawnLogic(gameSpace, overworld, map);
         this.participants = new Object2ObjectOpenHashMap<>();
-        this.world = world;
+        this.overworld = overworld;
+        this.nether = nether;
+        this.end = end;
 
         for (PlayerRef player : participants) {
             this.participants.put(player, new StevesManhuntMiniGamePlayer());
@@ -58,28 +66,20 @@ public class StevesManhuntMiniGameActive {
         this.timerBar = new StevesManhuntMiniGameTimerBar(widgets);
     }
 
-    public static void open(GameSpace gameSpace, ServerWorld world, StevesManhuntMiniGameMap map, StevesManhuntMiniGameConfig config) {
+    public static void open(GameSpace gameSpace, ServerWorld overworld, ServerWorld nether, ServerWorld end, StevesManhuntMiniGameMap map, StevesManhuntMiniGameConfig config) {
         gameSpace.setActivity(game -> {
             Set<PlayerRef> participants = gameSpace.getPlayers().participants().stream().map(PlayerRef::of).collect(Collectors.toSet());
             GlobalWidgets widgets = GlobalWidgets.addTo(game);
-            StevesManhuntMiniGameActive active = new StevesManhuntMiniGameActive(gameSpace, world, map, widgets, config, participants);
+            StevesManhuntMiniGameActive active = new StevesManhuntMiniGameActive(gameSpace, overworld, nether, end, map, widgets, config, participants);
 
-            game.setRule(GameRuleType.CRAFTING, EventResult.DENY);
-            game.setRule(GameRuleType.PORTALS, EventResult.DENY);
-            game.setRule(GameRuleType.PVP, EventResult.DENY);
-            game.setRule(GameRuleType.HUNGER, EventResult.DENY);
-            game.setRule(GameRuleType.FALL_DAMAGE, EventResult.DENY);
-            game.setRule(GameRuleType.INTERACTION, EventResult.DENY);
-            game.setRule(GameRuleType.BLOCK_DROPS, EventResult.DENY);
-            game.setRule(GameRuleType.THROW_ITEMS, EventResult.DENY);
-            game.setRule(GameRuleType.UNSTABLE_TNT, EventResult.DENY);
+            game.allow(GameRuleType.PORTALS);
 
             game.listen(GameActivityEvents.ENABLE, active::onOpen);
             game.listen(GameActivityEvents.DISABLE, active::onClose);
             game.listen(GameActivityEvents.STATE_UPDATE, state -> state.canPlay(false));
 
             game.listen(GamePlayerEvents.OFFER, JoinOffer::acceptSpectators);
-            game.listen(GamePlayerEvents.ACCEPT, joinAcceptor -> joinAcceptor.teleport(world, Vec3d.ZERO));
+            game.listen(GamePlayerEvents.ACCEPT, joinAcceptor -> joinAcceptor.teleport(overworld, Vec3d.ZERO));
             game.listen(GamePlayerEvents.ADD, active::addPlayer);
             game.listen(GamePlayerEvents.REMOVE, active::removePlayer);
 
@@ -87,6 +87,9 @@ public class StevesManhuntMiniGameActive {
 
             game.listen(PlayerDamageEvent.EVENT, active::onPlayerDamage);
             game.listen(PlayerDeathEvent.EVENT, active::onPlayerDeath);
+
+            game.listen(NetherPortalOpenEvent.EVENT, active::onNetherPortalOpen);
+            game.listen(EndPortalOpenEvent.EVENT, active::onEndPortalOpen);
         });
     }
 
@@ -98,7 +101,7 @@ public class StevesManhuntMiniGameActive {
             this.spawnSpectator(spectator);
         }
 
-        this.stageManager.onOpen(this.world.getTime(), this.config);
+        this.stageManager.onOpen(this.overworld.getTime(), this.config);
         // TODO setup logic
     }
 
@@ -128,6 +131,14 @@ public class StevesManhuntMiniGameActive {
         return ActionResult.CONSUME;
     }
 
+    private ActionResult onNetherPortalOpen(ServerWorld serverworld1, BlockPos blockpos2) {
+        return ActionResult.SUCCESS;
+    }
+
+    private ActionResult onEndPortalOpen(ItemUsageContext itemusagecontext1, Result result2) {
+        return ActionResult.SUCCESS;
+    }
+
     private void spawnParticipant(ServerPlayerEntity player) {
         this.spawnLogic.resetPlayer(player, GameMode.SURVIVAL);
         this.spawnLogic.spawnPlayer(player);
@@ -139,7 +150,7 @@ public class StevesManhuntMiniGameActive {
     }
 
     private void tick() {
-        long time = this.world.getTime();
+        long time = this.overworld.getTime();
 
         StevesManhuntMiniGameStageManager.IdleTickResult result = this.stageManager.tick(time, gameSpace);
 

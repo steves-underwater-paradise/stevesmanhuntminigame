@@ -2,8 +2,6 @@ package com.steveplays.stevesmanhuntminigame.game;
 
 import net.minecraft.util.math.Vec3d;
 import xyz.nucleoid.plasmid.api.game.GameSpace;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
@@ -29,8 +27,6 @@ public class StevesManhuntMiniGameSpawnLogic {
         player.changeGameMode(gameMode);
         player.setVelocity(Vec3d.ZERO);
         player.fallDistance = 0f;
-
-        player.addStatusEffect(new StatusEffectInstance(StatusEffects.NIGHT_VISION, 20 * 60 * 60, 1, true, false));
     }
 
     public void spawnPlayer(ServerPlayerEntity player) {
