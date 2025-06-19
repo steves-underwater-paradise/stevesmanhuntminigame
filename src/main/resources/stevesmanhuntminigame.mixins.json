@@ -8,7 +8,8 @@
 	},
 	"mixins": [
 		"portal.AbstractFireBlockMixin",
-		"portal.NetherPortalBlockMixin"
+		"portal.NetherPortalBlockMixin",
+		"portal.EndPortalBlockMixin"
 	],
 	"client": []
 }
