@@ -6,6 +6,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import xyz.nucleoid.fantasy.RuntimeWorldConfig;
 import xyz.nucleoid.plasmid.api.game.*;
+import net.minecraft.entity.boss.dragon.EnderDragonFight;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.GameMode;
@@ -41,6 +42,7 @@ public class StevesManhuntMiniGameWaiting {
         this.spawnLogic = new StevesManhuntMiniGameSpawnLogic(gameSpace, overworld, map);
     }
 
+    @SuppressWarnings("deprecation")
     public static GameOpenProcedure open(GameOpenContext<StevesManhuntMiniGameConfig> context) {
         StevesManhuntMiniGameConfig config = context.config();
         StevesManhuntMiniGameMapGenerator generator = new StevesManhuntMiniGameMapGenerator(config.mapConfig());
@@ -55,6 +57,7 @@ public class StevesManhuntMiniGameWaiting {
             var overworld = gameSpace.getWorlds().add(worldConfig);
             var nether = gameSpace.getWorlds().add(worldConfig.setDimensionType(DimensionTypes.THE_NETHER));
             var end = gameSpace.getWorlds().add(worldConfig.setDimensionType(DimensionTypes.THE_END));
+            end.setEnderDragonFight(new EnderDragonFight(end, end.getServer().getSaveProperties().getGeneratorOptions().getSeed(), EnderDragonFight.Data.DEFAULT));
 
             WorldBorderUtil.WarnInLogIfMultiWorldBordersIsNotInstalled();
             overworld.getWorldBorder().setSize(config.mapConfig().size);
