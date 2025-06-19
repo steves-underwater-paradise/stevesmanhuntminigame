@@ -1,5 +1,5 @@
 plugins {
-    id "fabric-loom" version "1.8.+"
+    id "fabric-loom" version "${fabric_loom_version}"
     id "maven-publish"
 }
 
@@ -11,6 +11,7 @@ version = project.mod_version
 group = project.maven_group
 
 repositories {
+    mavenCentral()
     maven {
         name = "Fabric"
         url = "https://maven.fabricmc.net/"
@@ -19,19 +20,28 @@ repositories {
         name = "Nucleoid"
         url = "https://maven.nucleoid.xyz/"
     }
+    flatDir {
+        dir rootProject.file("libraries/")
+    }
 }
 
 dependencies {
-    // Main
     minecraft("com.mojang:minecraft:${project.minecraft_version}")
     mappings("net.fabricmc:yarn:${project.yarn_mappings}:v2")
-    modImplementation("net.fabricmc:fabric-loader:${project.loader_version}")
+    modImplementation("net.fabricmc:fabric-loader:${project.fabric_loader_version}")
 
-    // Fabric API
-    modImplementation("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
-
-    // Plasmid
-    modImplementation("xyz.nucleoid:plasmid:${project.plasmid_version}")
+    modImplementation("net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}")
+    modImplementation("xyz.nucleoid:fantasy:0.6.4+1.21")
+    modImplementation("xyz.nucleoid:map-templates:0.2.0+1.21")
+    modImplementation("xyz.nucleoid:stimuli:0.4.12+1.21")
+    modImplementation("eu.pb4:sgui:1.6.1+1.21.1")
+    modImplementation("eu.pb4:sidebar-api:0.5.1+1.21.1")
+    modImplementation("eu.pb4:polymer-core:0.9.18+1.21.1")
+    modImplementation("eu.pb4:polymer-virtual-entity:0.9.18+1.21.1")
+    modImplementation("xyz.nucleoid:more-codecs:0.3.5+1.21.2")
+    modImplementation("xyz.nucleoid:server-translations-api:2.3.1+1.21-pre2")
+    modImplementation("me.lucko:fabric-permissions-api:0.3.1")
+    modImplementation("blank:plasmid-${project.plasmid_version}")
 }
 
 processResources {
@@ -42,13 +52,9 @@ processResources {
     }
 }
 
-// ensure that the encoding is set to UTF-8, no matter what the system default is
-// this fixes some edge cases with special characters not displaying correctly
-// see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
 tasks.withType(JavaCompile).configureEach {
     it.options.encoding = "UTF-8"
 }
-
 
 jar {
     from "LICENSE"

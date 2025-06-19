@@ -9,11 +9,11 @@ import com.steveplays.stevesmanhuntminigame.game.StevesManhuntMiniGameConfig;
 import com.steveplays.stevesmanhuntminigame.game.StevesManhuntMiniGameWaiting;
 
 public class StevesManhuntMiniGame implements ModInitializer {
-    public static final String ID = "stevesmanhuntminigame";
-    public static final Logger LOGGER = LogManager.getLogger(ID);
+    public static final String MOD_ID = "stevesmanhuntminigame";
+    public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 
     public static final GameType<StevesManhuntMiniGameConfig> TYPE = GameType.register(
-            Identifier.of(ID, "stevesmanhuntminigame"),
+            Identifier.of(MOD_ID, "stevesmanhuntminigame"),
             StevesManhuntMiniGameConfig.CODEC,
             StevesManhuntMiniGameWaiting::open);
 

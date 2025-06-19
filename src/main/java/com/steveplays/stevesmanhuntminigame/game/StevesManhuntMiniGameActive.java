@@ -2,7 +2,6 @@ package com.steveplays.stevesmanhuntminigame.game;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.Vec3d;
 import xyz.nucleoid.plasmid.api.game.GameCloseReason;
 import xyz.nucleoid.plasmid.api.game.GameSpace;
@@ -18,13 +17,14 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.GameMode;
 import com.steveplays.stevesmanhuntminigame.game.map.StevesManhuntMiniGameMap;
 import xyz.nucleoid.stimuli.event.EventResult;
 import xyz.nucleoid.stimuli.event.player.PlayerDamageEvent;
 import xyz.nucleoid.stimuli.event.player.PlayerDeathEvent;
-
+import static com.steveplays.stevesmanhuntminigame.util.TickUtil.TICKS_PER_SECOND;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -41,8 +41,7 @@ public class StevesManhuntMiniGameActive {
     private final StevesManhuntMiniGameTimerBar timerBar;
     private final ServerWorld world;
 
-    private StevesManhuntMiniGameActive(GameSpace gameSpace, ServerWorld world, StevesManhuntMiniGameMap map,
-            GlobalWidgets widgets, StevesManhuntMiniGameConfig config, Set<PlayerRef> participants) {
+    private StevesManhuntMiniGameActive(GameSpace gameSpace, ServerWorld world, StevesManhuntMiniGameMap map, GlobalWidgets widgets, StevesManhuntMiniGameConfig config, Set<PlayerRef> participants) {
         this.gameSpace = gameSpace;
         this.config = config;
         this.gameMap = map;
@@ -59,15 +58,11 @@ public class StevesManhuntMiniGameActive {
         this.timerBar = new StevesManhuntMiniGameTimerBar(widgets);
     }
 
-    public static void open(GameSpace gameSpace, ServerWorld world, StevesManhuntMiniGameMap map,
-            StevesManhuntMiniGameConfig config) {
+    public static void open(GameSpace gameSpace, ServerWorld world, StevesManhuntMiniGameMap map, StevesManhuntMiniGameConfig config) {
         gameSpace.setActivity(game -> {
-            Set<PlayerRef> participants = gameSpace.getPlayers().participants().stream()
-                    .map(PlayerRef::of)
-                    .collect(Collectors.toSet());
+            Set<PlayerRef> participants = gameSpace.getPlayers().participants().stream().map(PlayerRef::of).collect(Collectors.toSet());
             GlobalWidgets widgets = GlobalWidgets.addTo(game);
-            StevesManhuntMiniGameActive active = new StevesManhuntMiniGameActive(gameSpace, world, map, widgets, config,
-                    participants);
+            StevesManhuntMiniGameActive active = new StevesManhuntMiniGameActive(gameSpace, world, map, widgets, config, participants);
 
             game.setRule(GameRuleType.CRAFTING, EventResult.DENY);
             game.setRule(GameRuleType.PORTALS, EventResult.DENY);
@@ -112,8 +107,7 @@ public class StevesManhuntMiniGameActive {
     }
 
     private void addPlayer(ServerPlayerEntity player) {
-        if (!this.participants.containsKey(PlayerRef.of(player))
-                || this.gameSpace.getPlayers().spectators().contains(player)) {
+        if (!this.participants.containsKey(PlayerRef.of(player)) || this.gameSpace.getPlayers().spectators().contains(player)) {
             this.spawnSpectator(player);
         }
     }
@@ -122,16 +116,16 @@ public class StevesManhuntMiniGameActive {
         this.participants.remove(PlayerRef.of(player));
     }
 
-    private EventResult onPlayerDamage(ServerPlayerEntity player, DamageSource source, float amount) {
+    private ActionResult onPlayerDamage(ServerPlayerEntity player, DamageSource source, float amount) {
         // TODO handle damage
         this.spawnParticipant(player);
-        return EventResult.DENY;
+        return ActionResult.CONSUME;
     }
 
-    private EventResult onPlayerDeath(ServerPlayerEntity player, DamageSource source) {
+    private ActionResult onPlayerDeath(ServerPlayerEntity player, DamageSource source) {
         // TODO handle death
         this.spawnParticipant(player);
-        return EventResult.DENY;
+        return ActionResult.CONSUME;
     }
 
     private void spawnParticipant(ServerPlayerEntity player) {
@@ -162,7 +156,7 @@ public class StevesManhuntMiniGameActive {
                 return;
         }
 
-        this.timerBar.update(this.stageManager.finishTime - time, this.config.timeLimitSecs() * 20);
+        this.timerBar.update(this.stageManager.getFinishTime() - time, this.config.timeLimitSeconds() * TICKS_PER_SECOND);
 
         // TODO tick logic
     }

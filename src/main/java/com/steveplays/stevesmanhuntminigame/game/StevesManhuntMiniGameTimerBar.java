@@ -1,23 +1,28 @@
 package com.steveplays.stevesmanhuntminigame.game;
 
-import net.minecraft.entity.boss.BossBar;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import xyz.nucleoid.plasmid.api.game.common.GlobalWidgets;
-import xyz.nucleoid.plasmid.api.game.common.widget.BossBarWidget;
+import xyz.nucleoid.plasmid.api.game.common.widget.SidebarWidget;
 
 public final class StevesManhuntMiniGameTimerBar {
-    private final BossBarWidget widget;
+    private final SidebarWidget sidebarWidget;
 
     public StevesManhuntMiniGameTimerBar(GlobalWidgets widgets) {
-        Text title = Text.literal("Waiting for the game to start...");
-        this.widget = widgets.addBossBar(title, BossBar.Color.GREEN, BossBar.Style.NOTCHED_10);
+        // TODO: Display sidebar with different contents based on the player's team
+        // TODO: Replace literal text with translatable text
+        this.sidebarWidget = widgets.addSidebar(Text.literal("Manhunt"));
+        sidebarWidget.addLines(Text.literal("Waiting for the game to start..."));
     }
 
     public void update(long ticksUntilEnd, long totalTicksUntilEnd) {
-        if (ticksUntilEnd % 20 == 0) {
-            this.widget.setTitle(this.getText(ticksUntilEnd));
-            this.widget.setProgress((float) ticksUntilEnd / totalTicksUntilEnd);
+        if (ticksUntilEnd % 20 != 0) {
+            return;
         }
+
+        // TODO: Replace literal text with translatable text
+        sidebarWidget.clearLines();
+        sidebarWidget.addLines(Text.literal("Time remaining: "), this.getText(totalTicksUntilEnd));
     }
 
     private Text getText(long ticksUntilEnd) {
@@ -27,6 +32,6 @@ public final class StevesManhuntMiniGameTimerBar {
         long seconds = secondsUntilEnd % 60;
         String time = String.format("%02d:%02d left", minutes, seconds);
 
-        return Text.literal(time);
+        return Text.literal(time).styled(style -> style.withColor(Formatting.GRAY));
     }
 }
