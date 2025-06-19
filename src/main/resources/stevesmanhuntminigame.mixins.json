@@ -9,7 +9,8 @@
 	"mixins": [
 		"portal.AbstractFireBlockMixin",
 		"portal.NetherPortalBlockMixin",
-		"portal.EndPortalBlockMixin"
+		"portal.EndPortalBlockMixin",
+		"enderdragonfight.ServerWorldMixin"
 	],
 	"client": []
 }
