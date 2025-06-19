@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.block.AbstractFireBlock;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionTypes;
 import xyz.nucleoid.plasmid.api.game.GameSpaceManager;
 
 @Mixin(AbstractFireBlock.class)
@@ -19,6 +20,6 @@ public class AbstractFireBlockMixin {
 			return;
 		}
 
-		cir.setReturnValue(true);
+		cir.setReturnValue(world.getDimension().effects().equals(DimensionTypes.THE_NETHER_ID) || world.getDimension().effects().equals(DimensionTypes.OVERWORLD_ID));
 	}
 }
