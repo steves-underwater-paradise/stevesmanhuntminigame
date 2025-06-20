@@ -37,7 +37,7 @@ public class StevesManhuntMiniGameWaiting {
         this.overworld = overworld;
         this.nether = nether;
         this.end = end;
-        this.spawnLogic = new StevesManhuntMiniGameSpawnLogic(gameSpace, overworld);
+        this.spawnLogic = new StevesManhuntMiniGameSpawnLogic(gameSpace, overworld, config.mapConfig().spawnRadius);
     }
 
     @SuppressWarnings("deprecation")

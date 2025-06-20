@@ -12,10 +12,12 @@ import java.util.Set;
 public class StevesManhuntMiniGameSpawnLogic {
     private final GameSpace gameSpace;
     private final ServerWorld overworld;
+    private final int spawnRadius;
 
-    public StevesManhuntMiniGameSpawnLogic(GameSpace gameSpace, ServerWorld overworld) {
+    public StevesManhuntMiniGameSpawnLogic(GameSpace gameSpace, ServerWorld overworld, int spawnRadius) {
         this.gameSpace = gameSpace;
         this.overworld = overworld;
+        this.spawnRadius = spawnRadius;
     }
 
     public void resetPlayer(ServerPlayerEntity player, GameMode gameMode) {
@@ -27,9 +29,8 @@ public class StevesManhuntMiniGameSpawnLogic {
     public void spawnPlayer(ServerPlayerEntity player) {
         var spawnPosition = this.overworld.getSpawnPos();
         // TODO: Prevent spawning players in blocks
-        float spawnRadius = 4.5f;
-        float x = spawnPosition.getX() + MathHelper.nextFloat(player.getRandom(), -spawnRadius, spawnRadius);
-        float z = spawnPosition.getZ() + MathHelper.nextFloat(player.getRandom(), -spawnRadius, spawnRadius);
+        float x = spawnPosition.getX() + MathHelper.nextFloat(player.getRandom(), -this.spawnRadius, this.spawnRadius);
+        float z = spawnPosition.getZ() + MathHelper.nextFloat(player.getRandom(), -this.spawnRadius, this.spawnRadius);
 
         player.teleport(this.overworld, x, spawnPosition.getY(), z, Set.of(), 0f, 0f);
     }

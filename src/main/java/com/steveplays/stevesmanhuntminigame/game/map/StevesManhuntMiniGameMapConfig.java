@@ -1,20 +1,19 @@
 package com.steveplays.stevesmanhuntminigame.game.map;
 
-import org.jetbrains.annotations.NotNull;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.block.BlockState;
+import net.minecraft.util.dynamic.Codecs;
 
 public class StevesManhuntMiniGameMapConfig {
-    public static final Codec<StevesManhuntMiniGameMapConfig> CODEC =
-            RecordCodecBuilder.create(instance -> instance.group(Codec.INT.fieldOf("size").forGetter(map -> map.size), BlockState.CODEC.fieldOf("spawn_block").forGetter(map -> map.spawnBlock))
+    public static final Codec<StevesManhuntMiniGameMapConfig> CODEC = RecordCodecBuilder.create(
+            instance -> instance.group(Codecs.rangedInt(3500, Integer.MAX_VALUE).fieldOf("size").forGetter(map -> map.size), Codec.INT.fieldOf("spawn_radius").forGetter(map -> map.spawnRadius))
                     .apply(instance, StevesManhuntMiniGameMapConfig::new));
 
     public final int size;
-    public final @NotNull BlockState spawnBlock;
+    public final int spawnRadius;
 
-    public StevesManhuntMiniGameMapConfig(int size, @NotNull BlockState spawnBlock) {
+    public StevesManhuntMiniGameMapConfig(int size, int spawnRadius) {
         this.size = size;
-        this.spawnBlock = spawnBlock;
+        this.spawnRadius = spawnRadius;
     }
 }

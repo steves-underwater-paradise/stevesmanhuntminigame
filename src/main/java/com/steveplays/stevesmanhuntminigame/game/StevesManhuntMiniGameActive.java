@@ -47,7 +47,7 @@ public class StevesManhuntMiniGameActive {
             Set<PlayerRef> participants) {
         this.gameSpace = gameSpace;
         this.config = config;
-        this.spawnLogic = new StevesManhuntMiniGameSpawnLogic(gameSpace, overworld);
+        this.spawnLogic = new StevesManhuntMiniGameSpawnLogic(gameSpace, overworld, config.mapConfig().spawnRadius);
         this.participants = new Object2ObjectOpenHashMap<>();
         this.overworld = overworld;
         this.nether = nether;

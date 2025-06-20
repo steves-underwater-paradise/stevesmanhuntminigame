@@ -1,11 +1,8 @@
 {
   "type": "stevesmanhuntminigame:stevesmanhuntminigame",
   "map": {
-    "size": 128,
-    "spawn_block": {
-      "Name": "minecraft:red_terracotta",
-      "Properties": {}
-    }
+    "size": 3500,
+    "spawn_radius": 4
   },
   "players": {
     "min": 1,
