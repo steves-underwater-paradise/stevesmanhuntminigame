@@ -4,9 +4,14 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 import xyz.nucleoid.plasmid.api.game.GameCloseReason;
 import xyz.nucleoid.plasmid.api.game.GameSpace;
 import xyz.nucleoid.plasmid.api.game.common.GlobalWidgets;
+import xyz.nucleoid.plasmid.api.game.common.team.GameTeam;
+import xyz.nucleoid.plasmid.api.game.common.team.GameTeamConfig;
+import xyz.nucleoid.plasmid.api.game.common.team.GameTeamKey;
+import xyz.nucleoid.plasmid.api.game.common.team.TeamManager;
 import xyz.nucleoid.plasmid.api.game.event.GameActivityEvents;
 import xyz.nucleoid.plasmid.api.game.event.GamePlayerEvents;
 import xyz.nucleoid.plasmid.api.game.player.JoinOffer;
@@ -16,11 +21,14 @@ import xyz.nucleoid.plasmid.api.util.PlayerRef;
 import net.minecraft.block.pattern.BlockPattern.Result;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.item.ItemUsageContext;
+import net.minecraft.scoreboard.AbstractTeam.CollisionRule;
+import net.minecraft.scoreboard.AbstractTeam.VisibilityRule;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.DyeColor;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.GameMode;
 import xyz.nucleoid.stimuli.event.player.PlayerDeathEvent;
@@ -33,18 +41,22 @@ import java.util.stream.Collectors;
 public class StevesManhuntMiniGameActive {
     public final GameSpace gameSpace;
 
+    private final ServerWorld overworld;
+    private final ServerWorld nether;
+    private final ServerWorld end;
     private final StevesManhuntMiniGameConfig config;
     private final Object2ObjectMap<PlayerRef, StevesManhuntMiniGamePlayer> participants;
     private final StevesManhuntMiniGameSpawnLogic spawnLogic;
     private final StevesManhuntMiniGameStageManager stageManager;
     private final boolean ignoreWinState;
-    private final StevesManhuntMiniGameTimerBar timerBar;
-    private final ServerWorld overworld;
-    private final ServerWorld nether;
-    private final ServerWorld end;
+    private final GlobalWidgets widgets;
+    private final TeamManager teamManager;
+    private final GameTeam hunterTeam;
+    private final GameTeam runnerTeam;
+    private final StevesManhuntMiniGameSideBar timerBar;
 
-    private StevesManhuntMiniGameActive(GameSpace gameSpace, ServerWorld overworld, ServerWorld nether, ServerWorld end, GlobalWidgets widgets, StevesManhuntMiniGameConfig config,
-            Set<PlayerRef> participants) {
+    private StevesManhuntMiniGameActive(GameSpace gameSpace, ServerWorld overworld, ServerWorld nether, ServerWorld end, GlobalWidgets widgets, TeamManager teamManager,
+            StevesManhuntMiniGameConfig config, Set<PlayerRef> participants) {
         this.gameSpace = gameSpace;
         this.config = config;
         this.spawnLogic = new StevesManhuntMiniGameSpawnLogic(gameSpace, overworld, config.mapConfig().spawnRadius);
@@ -59,14 +71,24 @@ public class StevesManhuntMiniGameActive {
 
         this.stageManager = new StevesManhuntMiniGameStageManager();
         this.ignoreWinState = this.participants.size() <= 1;
-        this.timerBar = new StevesManhuntMiniGameTimerBar(widgets);
+        this.widgets = widgets;
+        this.teamManager = teamManager;
+
+        // TODO: Replace literal text with translatable text
+        this.hunterTeam = new GameTeam(new GameTeamKey("hunters"),
+                new GameTeamConfig(Text.literal("Hunters"), GameTeamConfig.Colors.from(DyeColor.RED), true, CollisionRule.ALWAYS, VisibilityRule.ALWAYS, Text.literal("[Hunter] "), Text.empty()));
+        this.runnerTeam = new GameTeam(new GameTeamKey("runners"),
+                new GameTeamConfig(Text.literal("Runners"), GameTeamConfig.Colors.from(DyeColor.RED), true, CollisionRule.ALWAYS, VisibilityRule.ALWAYS, Text.empty(), Text.empty()));
+
+        this.timerBar = new StevesManhuntMiniGameSideBar(widgets);
     }
 
     public static void open(GameSpace gameSpace, ServerWorld overworld, ServerWorld nether, ServerWorld end, StevesManhuntMiniGameConfig config) {
         gameSpace.setActivity(game -> {
             Set<PlayerRef> participants = gameSpace.getPlayers().participants().stream().map(PlayerRef::of).collect(Collectors.toSet());
             GlobalWidgets widgets = GlobalWidgets.addTo(game);
-            StevesManhuntMiniGameActive active = new StevesManhuntMiniGameActive(gameSpace, overworld, nether, end, widgets, config, participants);
+            TeamManager teamManager = TeamManager.addTo(game);
+            StevesManhuntMiniGameActive active = new StevesManhuntMiniGameActive(gameSpace, overworld, nether, end, widgets, teamManager, config, participants);
 
             game.allow(GameRuleType.PORTALS);
 
@@ -89,15 +111,24 @@ public class StevesManhuntMiniGameActive {
     }
 
     private void onOpen() {
+        this.teamManager.addTeam(this.hunterTeam);
+        this.teamManager.addTeam(this.runnerTeam);
+
+        var random = Random.create();
         for (var participant : this.gameSpace.getPlayers().participants()) {
             this.spawnParticipant(participant);
+            if (random.nextFloat() > 0.8f) {
+                this.teamManager.addPlayerTo(participant, this.hunterTeam.key());
+            } else {
+                this.teamManager.addPlayerTo(participant, this.runnerTeam.key());
+            }
         }
         for (var spectator : this.gameSpace.getPlayers().spectators()) {
             this.spawnSpectator(spectator);
         }
 
         this.stageManager.onOpen(this.overworld.getTime(), this.config);
-        // TODO setup logic
+        this.timerBar.onOpen(this.widgets, this.teamManager, this.hunterTeam.key(), this.runnerTeam.key());
     }
 
     private void onClose() {
@@ -115,7 +146,7 @@ public class StevesManhuntMiniGameActive {
     }
 
     private ActionResult onPlayerDeath(ServerPlayerEntity player, DamageSource source) {
-        // TODO handle death
+        // TODO: Fix beds allowing players to respawn in different game spaces
         this.spawnParticipant(player);
         return ActionResult.CONSUME;
     }
@@ -177,7 +208,7 @@ public class StevesManhuntMiniGameActive {
     }
 
     private WinResult checkWinResult() {
-        // for testing purposes: don't end the game if we only ever had one participant
+        // For testing purposes: don't end the game if we only ever had one participant
         if (this.ignoreWinState) {
             return WinResult.no();
         }

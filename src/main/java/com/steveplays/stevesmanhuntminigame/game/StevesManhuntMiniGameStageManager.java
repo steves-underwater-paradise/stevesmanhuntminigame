@@ -91,10 +91,10 @@ public class StevesManhuntMiniGameStageManager {
             PlayerSet players = space.getPlayers();
             if (timeUntilStartSecondsFloored > 0) {
                 players.showTitle(Text.literal(Integer.toString(timeUntilStartSecondsFloored)).formatted(Formatting.BOLD), 20);
-                players.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.PLAYERS, 1.0F, 1.0F);
+                players.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.PLAYERS, 0.5f, 1.0f);
             } else {
                 players.showTitle(Text.literal("Go!").formatted(Formatting.BOLD), 20);
-                players.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.PLAYERS, 1.0F, 2.0F);
+                players.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.PLAYERS, 0.5f, 2.0f);
             }
         }
     }
