@@ -46,15 +46,16 @@ public class StevesManhuntMiniGameWaiting {
             var gameSpace = game.getGameSpace();
             var server = gameSpace.getServer();
             var random = Random.create();
+            var seed = random.nextLong();
             var overworld = gameSpace.getWorlds()
-                    .add(new RuntimeWorldConfig().setGameRule(GameRules.DO_MOB_SPAWNING, true).setGenerator(server.getOverworld().getChunkManager().getChunkGenerator()).setTimeOfDay(0)
+                    .add(new RuntimeWorldConfig().setSeed(seed).setGameRule(GameRules.DO_MOB_SPAWNING, true).setGenerator(server.getOverworld().getChunkManager().getChunkGenerator()).setTimeOfDay(0)
                             .setShouldTickTime(true).setGameRule(GameRules.DO_WEATHER_CYCLE, true)
                             .setSunny(random.nextBetween(MIN_TIME_UNTIL_WEATHER_CHANGE_TICKS, MAX_TIME_UNTIL_WEATHER_CHANGE_TICKS)));
-            var nether = gameSpace.getWorlds().add(new RuntimeWorldConfig().setGameRule(GameRules.DO_MOB_SPAWNING, true)
+            var nether = gameSpace.getWorlds().add(new RuntimeWorldConfig().setSeed(seed).setGameRule(GameRules.DO_MOB_SPAWNING, true)
                     .setGenerator(server.getWorld(World.NETHER).getChunkManager().getChunkGenerator()).setDimensionType(DimensionTypes.THE_NETHER));
-            var end = gameSpace.getWorlds().add(new RuntimeWorldConfig().setGameRule(GameRules.DO_MOB_SPAWNING, true).setGenerator(server.getWorld(World.END).getChunkManager().getChunkGenerator())
-                    .setDimensionType(DimensionTypes.THE_END));
-            end.setEnderDragonFight(new EnderDragonFight(end, end.getServer().getSaveProperties().getGeneratorOptions().getSeed(), EnderDragonFight.Data.DEFAULT));
+            var end = gameSpace.getWorlds().add(new RuntimeWorldConfig().setSeed(seed).setGameRule(GameRules.DO_MOB_SPAWNING, true)
+                    .setGenerator(server.getWorld(World.END).getChunkManager().getChunkGenerator()).setDimensionType(DimensionTypes.THE_END));
+            end.setEnderDragonFight(new EnderDragonFight(end, seed, EnderDragonFight.Data.DEFAULT));
 
             WorldBorderUtil.WarnInLogIfMultiWorldBordersIsNotInstalled();
 
