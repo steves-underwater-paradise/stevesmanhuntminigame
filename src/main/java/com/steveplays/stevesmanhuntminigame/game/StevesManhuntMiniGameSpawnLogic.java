@@ -4,23 +4,18 @@ import net.minecraft.util.math.Vec3d;
 import xyz.nucleoid.plasmid.api.game.GameSpace;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.GameMode;
-import com.steveplays.stevesmanhuntminigame.StevesManhuntMiniGame;
-import com.steveplays.stevesmanhuntminigame.game.map.StevesManhuntMiniGameMap;
 
 import java.util.Set;
 
 public class StevesManhuntMiniGameSpawnLogic {
     private final GameSpace gameSpace;
-    private final StevesManhuntMiniGameMap map;
-    private final ServerWorld world;
+    private final ServerWorld overworld;
 
-    public StevesManhuntMiniGameSpawnLogic(GameSpace gameSpace, ServerWorld world, StevesManhuntMiniGameMap map) {
+    public StevesManhuntMiniGameSpawnLogic(GameSpace gameSpace, ServerWorld overworld) {
         this.gameSpace = gameSpace;
-        this.map = map;
-        this.world = world;
+        this.overworld = overworld;
     }
 
     public void resetPlayer(ServerPlayerEntity player, GameMode gameMode) {
@@ -30,16 +25,12 @@ public class StevesManhuntMiniGameSpawnLogic {
     }
 
     public void spawnPlayer(ServerPlayerEntity player) {
-        BlockPos pos = this.map.spawn;
-        if (pos == null) {
-            StevesManhuntMiniGame.LOGGER.error("Cannot spawn player. No spawn is defined in the map.");
-            return;
-        }
+        var spawnPosition = this.overworld.getSpawnPos();
+        // TODO: Prevent spawning players in blocks
+        float spawnRadius = 4.5f;
+        float x = spawnPosition.getX() + MathHelper.nextFloat(player.getRandom(), -spawnRadius, spawnRadius);
+        float z = spawnPosition.getZ() + MathHelper.nextFloat(player.getRandom(), -spawnRadius, spawnRadius);
 
-        float radius = 4.5f;
-        float x = pos.getX() + MathHelper.nextFloat(player.getRandom(), -radius, radius);
-        float z = pos.getZ() + MathHelper.nextFloat(player.getRandom(), -radius, radius);
-
-        player.teleport(this.world, x, pos.getY(), z, Set.of(), 0f, 0f);
+        player.teleport(this.overworld, x, spawnPosition.getY(), z, Set.of(), 0f, 0f);
     }
 }

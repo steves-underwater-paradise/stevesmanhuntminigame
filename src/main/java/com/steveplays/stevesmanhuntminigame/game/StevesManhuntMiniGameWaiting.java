@@ -10,9 +10,9 @@ import net.minecraft.entity.boss.dragon.EnderDragonFight;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.GameMode;
+import net.minecraft.world.GameRules;
+import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionTypes;
-import com.steveplays.stevesmanhuntminigame.game.map.StevesManhuntMiniGameMap;
-import com.steveplays.stevesmanhuntminigame.game.map.StevesManhuntMiniGameMapGenerator;
 import com.steveplays.stevesmanhuntminigame.util.WorldBorderUtil;
 import xyz.nucleoid.plasmid.api.game.common.GameWaitingLobby;
 import xyz.nucleoid.plasmid.api.game.event.GameActivityEvents;
@@ -25,46 +25,42 @@ import static com.steveplays.stevesmanhuntminigame.util.WeatherUtil.MAX_TIME_UNT
 
 public class StevesManhuntMiniGameWaiting {
     private final GameSpace gameSpace;
-    private final StevesManhuntMiniGameMap map;
     private final StevesManhuntMiniGameConfig config;
     private final StevesManhuntMiniGameSpawnLogic spawnLogic;
     private final ServerWorld overworld;
     private final ServerWorld nether;
     private final ServerWorld end;
 
-    private StevesManhuntMiniGameWaiting(GameSpace gameSpace, ServerWorld overworld, ServerWorld nether, ServerWorld end, StevesManhuntMiniGameMap map, StevesManhuntMiniGameConfig config) {
+    private StevesManhuntMiniGameWaiting(GameSpace gameSpace, ServerWorld overworld, ServerWorld nether, ServerWorld end, StevesManhuntMiniGameConfig config) {
         this.gameSpace = gameSpace;
-        this.map = map;
         this.config = config;
         this.overworld = overworld;
         this.nether = nether;
         this.end = end;
-        this.spawnLogic = new StevesManhuntMiniGameSpawnLogic(gameSpace, overworld, map);
+        this.spawnLogic = new StevesManhuntMiniGameSpawnLogic(gameSpace, overworld);
     }
 
     @SuppressWarnings("deprecation")
     public static GameOpenProcedure open(GameOpenContext<StevesManhuntMiniGameConfig> context) {
-        StevesManhuntMiniGameConfig config = context.config();
-        StevesManhuntMiniGameMapGenerator generator = new StevesManhuntMiniGameMapGenerator(config.mapConfig());
-        StevesManhuntMiniGameMap map = generator.build();
-
-        var random = Random.create();
-        RuntimeWorldConfig worldConfig = new RuntimeWorldConfig().setGenerator(map.asGenerator(context.server())).setTimeOfDay(0).setShouldTickTime(true)
-                .setSunny(random.nextBetween(MIN_TIME_UNTIL_WEATHER_CHANGE_TICKS, MAX_TIME_UNTIL_WEATHER_CHANGE_TICKS));
-
         return context.open(game -> {
             var gameSpace = game.getGameSpace();
-            var overworld = gameSpace.getWorlds().add(worldConfig);
-            var nether = gameSpace.getWorlds().add(worldConfig.setDimensionType(DimensionTypes.THE_NETHER));
-            var end = gameSpace.getWorlds().add(worldConfig.setDimensionType(DimensionTypes.THE_END));
+            var server = gameSpace.getServer();
+            var runtimeWorldConfig = new RuntimeWorldConfig().setGameRule(GameRules.DO_MOB_SPAWNING, true);
+            var random = Random.create();
+            var overworld = gameSpace.getWorlds().add(runtimeWorldConfig.setGenerator(server.getOverworld().getChunkManager().getChunkGenerator()).setTimeOfDay(0).setShouldTickTime(true)
+                    .setSunny(random.nextBetween(MIN_TIME_UNTIL_WEATHER_CHANGE_TICKS, MAX_TIME_UNTIL_WEATHER_CHANGE_TICKS)));
+            var nether = gameSpace.getWorlds().add(runtimeWorldConfig.setGenerator(server.getWorld(World.NETHER).getChunkManager().getChunkGenerator()).setDimensionType(DimensionTypes.THE_NETHER));
+            var end = gameSpace.getWorlds().add(runtimeWorldConfig.setGenerator(server.getWorld(World.END).getChunkManager().getChunkGenerator()).setDimensionType(DimensionTypes.THE_END));
             end.setEnderDragonFight(new EnderDragonFight(end, end.getServer().getSaveProperties().getGeneratorOptions().getSeed(), EnderDragonFight.Data.DEFAULT));
 
             WorldBorderUtil.WarnInLogIfMultiWorldBordersIsNotInstalled();
+
+            var config = context.config();
             overworld.getWorldBorder().setSize(config.mapConfig().size);
             nether.getWorldBorder().setSize(config.mapConfig().size);
             end.getWorldBorder().setSize(config.mapConfig().size);
 
-            StevesManhuntMiniGameWaiting waiting = new StevesManhuntMiniGameWaiting(gameSpace, overworld, nether, end, map, context.config());
+            StevesManhuntMiniGameWaiting waiting = new StevesManhuntMiniGameWaiting(gameSpace, overworld, nether, end, config);
             GameWaitingLobby.addTo(game, config.players());
             game.listen(GameActivityEvents.REQUEST_START, waiting::requestStart);
             game.listen(GamePlayerEvents.ADD, waiting::addPlayer);
@@ -75,7 +71,7 @@ public class StevesManhuntMiniGameWaiting {
     }
 
     private GameResult requestStart() {
-        StevesManhuntMiniGameActive.open(this.gameSpace, this.overworld, this.nether, this.end, this.map, this.config);
+        StevesManhuntMiniGameActive.open(this.gameSpace, this.overworld, this.nether, this.end, this.config);
         return GameResult.ok();
     }
 

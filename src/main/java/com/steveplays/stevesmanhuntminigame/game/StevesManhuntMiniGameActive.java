@@ -23,8 +23,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.GameMode;
-import com.steveplays.stevesmanhuntminigame.game.map.StevesManhuntMiniGameMap;
-import xyz.nucleoid.stimuli.event.player.PlayerDamageEvent;
 import xyz.nucleoid.stimuli.event.player.PlayerDeathEvent;
 import xyz.nucleoid.stimuli.event.world.EndPortalOpenEvent;
 import xyz.nucleoid.stimuli.event.world.NetherPortalOpenEvent;
@@ -36,7 +34,6 @@ public class StevesManhuntMiniGameActive {
     public final GameSpace gameSpace;
 
     private final StevesManhuntMiniGameConfig config;
-    private final StevesManhuntMiniGameMap gameMap;
     private final Object2ObjectMap<PlayerRef, StevesManhuntMiniGamePlayer> participants;
     private final StevesManhuntMiniGameSpawnLogic spawnLogic;
     private final StevesManhuntMiniGameStageManager stageManager;
@@ -46,12 +43,11 @@ public class StevesManhuntMiniGameActive {
     private final ServerWorld nether;
     private final ServerWorld end;
 
-    private StevesManhuntMiniGameActive(GameSpace gameSpace, ServerWorld overworld, ServerWorld nether, ServerWorld end, StevesManhuntMiniGameMap map, GlobalWidgets widgets,
-            StevesManhuntMiniGameConfig config, Set<PlayerRef> participants) {
+    private StevesManhuntMiniGameActive(GameSpace gameSpace, ServerWorld overworld, ServerWorld nether, ServerWorld end, GlobalWidgets widgets, StevesManhuntMiniGameConfig config,
+            Set<PlayerRef> participants) {
         this.gameSpace = gameSpace;
         this.config = config;
-        this.gameMap = map;
-        this.spawnLogic = new StevesManhuntMiniGameSpawnLogic(gameSpace, overworld, map);
+        this.spawnLogic = new StevesManhuntMiniGameSpawnLogic(gameSpace, overworld);
         this.participants = new Object2ObjectOpenHashMap<>();
         this.overworld = overworld;
         this.nether = nether;
@@ -66,11 +62,11 @@ public class StevesManhuntMiniGameActive {
         this.timerBar = new StevesManhuntMiniGameTimerBar(widgets);
     }
 
-    public static void open(GameSpace gameSpace, ServerWorld overworld, ServerWorld nether, ServerWorld end, StevesManhuntMiniGameMap map, StevesManhuntMiniGameConfig config) {
+    public static void open(GameSpace gameSpace, ServerWorld overworld, ServerWorld nether, ServerWorld end, StevesManhuntMiniGameConfig config) {
         gameSpace.setActivity(game -> {
             Set<PlayerRef> participants = gameSpace.getPlayers().participants().stream().map(PlayerRef::of).collect(Collectors.toSet());
             GlobalWidgets widgets = GlobalWidgets.addTo(game);
-            StevesManhuntMiniGameActive active = new StevesManhuntMiniGameActive(gameSpace, overworld, nether, end, map, widgets, config, participants);
+            StevesManhuntMiniGameActive active = new StevesManhuntMiniGameActive(gameSpace, overworld, nether, end, widgets, config, participants);
 
             game.allow(GameRuleType.PORTALS);
 
