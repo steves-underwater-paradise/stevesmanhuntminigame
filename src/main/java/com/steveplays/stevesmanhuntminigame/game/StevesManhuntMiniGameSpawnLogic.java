@@ -10,6 +10,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.Heightmap;
 import java.util.Set;
+import com.steveplays.stevesmanhuntminigame.util.HungerManagerUtil;
 
 public class StevesManhuntMiniGameSpawnLogic {
     private final GameSpace gameSpace;
@@ -26,9 +27,12 @@ public class StevesManhuntMiniGameSpawnLogic {
         player.changeGameMode(gameMode);
         player.setVelocity(Vec3d.ZERO);
         player.fallDistance = 0f;
+        player.clearStatusEffects();
 
-        // TODO: Reset player hunger and saturation
-        // TODO: Remove player effects
+        var playerHungerManager = player.getHungerManager();
+        playerHungerManager.setExhaustion(0f);
+        playerHungerManager.setFoodLevel(HungerManagerUtil.SPAWN_FOOD_LEVEL);
+        playerHungerManager.setSaturationLevel(HungerManagerUtil.SPAWN_SATURATION_LEVEL);
     }
 
     public void spawnPlayer(ServerPlayerEntity player) {
