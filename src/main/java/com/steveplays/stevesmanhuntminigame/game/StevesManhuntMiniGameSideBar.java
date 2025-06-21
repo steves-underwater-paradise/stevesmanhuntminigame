@@ -64,13 +64,13 @@ public final class StevesManhuntMiniGameSideBar {
 
         // TODO: Replace literal text with translatable text
         hunterSidebarWidget.clearLines();
-        hunterSidebarWidget.addLines(Text.literal("Your team: Hunter"));
+        hunterSidebarWidget.addLines(Text.literal("Your team: Hunters"));
         hunterSidebarWidget.addLines(Text.literal("Time remaining: ").append(this.getText(ticksUntilEnd)));
-        hunterSidebarWidget.addLines(Text.literal(""), Text.literal("Closest runner:"), Text.literal("- Distance: TODO m"), Text.literal("- Direction:"));
+        hunterSidebarWidget.addLines(Text.literal(""), Text.literal("Closest Runner:"), Text.literal("- Distance: TODO m"), Text.literal("- Direction:"));
         hunterSidebarWidget.addLines(COMPASS_SOUTH);
 
         runnerSidebarWidget.clearLines();
-        runnerSidebarWidget.addLines(Text.literal("Your team: Runner"));
+        runnerSidebarWidget.addLines(Text.literal("Your team: Runners"));
         runnerSidebarWidget.addLines(Text.literal("Time remaining: ").append(this.getText(ticksUntilEnd)));
     }
 

@@ -75,10 +75,10 @@ public class StevesManhuntMiniGameActive {
         this.teamManager = teamManager;
 
         // TODO: Replace literal text with translatable text
-        this.hunterTeam = new GameTeam(new GameTeamKey("hunters"),
-                new GameTeamConfig(Text.literal("Hunters"), GameTeamConfig.Colors.from(DyeColor.RED), true, CollisionRule.ALWAYS, VisibilityRule.ALWAYS, Text.literal("[Hunter] "), Text.empty()));
+        this.hunterTeam = new GameTeam(new GameTeamKey("hunters"), new GameTeamConfig(Text.literal("Hunters"), GameTeamConfig.Colors.from(DyeColor.RED), true, CollisionRule.ALWAYS,
+                VisibilityRule.ALWAYS, Text.literal("[Hunter] ").styled(style -> style.withColor(Formatting.RED)), Text.empty()));
         this.runnerTeam = new GameTeam(new GameTeamKey("runners"),
-                new GameTeamConfig(Text.literal("Runners"), GameTeamConfig.Colors.from(DyeColor.RED), true, CollisionRule.ALWAYS, VisibilityRule.ALWAYS, Text.empty(), Text.empty()));
+                new GameTeamConfig(Text.literal("Runners"), GameTeamConfig.Colors.from(DyeColor.BLUE), true, CollisionRule.ALWAYS, VisibilityRule.ALWAYS, Text.empty(), Text.empty()));
 
         this.timerBar = new StevesManhuntMiniGameSideBar(widgets);
     }
@@ -114,14 +114,24 @@ public class StevesManhuntMiniGameActive {
         this.teamManager.addTeam(this.hunterTeam);
         this.teamManager.addTeam(this.runnerTeam);
 
-        var random = Random.create();
+        List<ServerPlayerEntity> participants = new ArrayList<>();
         for (var participant : this.gameSpace.getPlayers().participants()) {
-            this.spawnParticipant(participant);
-            if (random.nextFloat() > 0.8f) {
-                this.teamManager.addPlayerTo(participant, this.hunterTeam.key());
-            } else {
+            participants.add(participant);
+        }
+
+        var huntersTeamRatio = 0.2f;
+        var random = Random.create();
+        for (int i = 0; i < (int) Math.round(participants.size() * huntersTeamRatio); i++) {
+            this.teamManager.addPlayerTo(participants.get(random.nextInt(participants.size())), this.hunterTeam.key());
+        }
+
+        for (var participant : this.gameSpace.getPlayers().participants()) {
+            if (this.teamManager.teamFor(participant) == null) {
                 this.teamManager.addPlayerTo(participant, this.runnerTeam.key());
+                participant.setCustomName(Text.literal("Runner").styled(style -> style.withColor(Formatting.BLUE)));
             }
+
+            this.spawnParticipant(participant);
         }
         for (var spectator : this.gameSpace.getPlayers().spectators()) {
             this.spawnSpectator(spectator);
