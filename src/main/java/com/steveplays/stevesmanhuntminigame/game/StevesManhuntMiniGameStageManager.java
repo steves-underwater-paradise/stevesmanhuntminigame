@@ -1,19 +1,23 @@
 package com.steveplays.stevesmanhuntminigame.game;
 
 import com.google.common.collect.ImmutableSet;
+import com.steveplays.stevesmanhuntminigame.util.WinUtil;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
 import xyz.nucleoid.plasmid.api.game.GameSpace;
+import xyz.nucleoid.plasmid.api.game.common.team.GameTeamKey;
+import xyz.nucleoid.plasmid.api.game.common.team.TeamManager;
 import xyz.nucleoid.plasmid.api.game.player.PlayerSet;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
-
+import static com.steveplays.stevesmanhuntminigame.util.TickUtil.TICKS_PER_SECOND;
 import static com.steveplays.stevesmanhuntminigame.util.TickUtil.TICKS_PER_SECOND_FLOAT;
 
 public class StevesManhuntMiniGameStageManager {
@@ -22,7 +26,6 @@ public class StevesManhuntMiniGameStageManager {
     private long startTime = -1;
     private long finishTime = -1;
     private long closeTime = -1;
-    private boolean allPlayersAreSpectating = false;
 
     public StevesManhuntMiniGameStageManager() {
         this.frozen = new Object2ObjectOpenHashMap<>();
@@ -37,7 +40,7 @@ public class StevesManhuntMiniGameStageManager {
         return finishTime;
     }
 
-    public IdleTickResult tick(long time, GameSpace space) {
+    public IdleTickResult tick(long time, GameSpace gameSpace, TeamManager teamManager, GameTeamKey hunterTeamKey, GameTeamKey runnerTeamKey, boolean ignoreWinState, ServerWorld end) {
         // Game has finished. Wait a few seconds before finally closing the game.
         if (this.closeTime > 0) {
             if (time >= this.closeTime) {
@@ -48,21 +51,13 @@ public class StevesManhuntMiniGameStageManager {
 
         // Game hasn't started yet. Display a countdown before it begins.
         if (this.startTime > time) {
-            this.tickStartWaiting(time, space);
+            this.tickStartWaiting(time, gameSpace);
             return IdleTickResult.TICK_FINISHED;
         }
 
         // Game has just finished. Transition to the waiting-before-close state.
-        if (time > this.finishTime || space.getPlayers().isEmpty()) {
-            if (!this.allPlayersAreSpectating) {
-                this.allPlayersAreSpectating = true;
-                for (ServerPlayerEntity player : space.getPlayers()) {
-                    player.changeGameMode(GameMode.SPECTATOR);
-                }
-            }
-
-            this.closeTime = time + (5 * 20);
-
+        if (time > this.finishTime || WinUtil.checkWinResult(ignoreWinState, teamManager, hunterTeamKey, runnerTeamKey, end).isWin() || gameSpace.getPlayers().isEmpty()) {
+            this.closeTime = time + (5 * TICKS_PER_SECOND);
             return IdleTickResult.GAME_FINISHED;
         }
 

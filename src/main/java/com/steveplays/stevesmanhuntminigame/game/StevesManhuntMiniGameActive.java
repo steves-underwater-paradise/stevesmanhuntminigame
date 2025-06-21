@@ -37,6 +37,8 @@ import xyz.nucleoid.stimuli.event.world.NetherPortalOpenEvent;
 import static com.steveplays.stevesmanhuntminigame.util.TickUtil.TICKS_PER_SECOND;
 import java.util.*;
 import java.util.stream.Collectors;
+import org.jetbrains.annotations.Nullable;
+import com.steveplays.stevesmanhuntminigame.util.WinUtil;
 
 public class StevesManhuntMiniGameActive {
     public final GameSpace gameSpace;
@@ -181,16 +183,18 @@ public class StevesManhuntMiniGameActive {
 
     private void tick() {
         long time = this.overworld.getTime();
-
-        StevesManhuntMiniGameStageManager.IdleTickResult result = this.stageManager.tick(time, gameSpace);
-
+        StevesManhuntMiniGameStageManager.IdleTickResult result =
+                this.stageManager.tick(time, this.gameSpace, this.teamManager, this.hunterTeam.key(), this.runnerTeam.key(), this.ignoreWinState, this.end);
         switch (result) {
             case CONTINUE_TICK:
                 break;
             case TICK_FINISHED:
                 return;
             case GAME_FINISHED:
-                this.broadcastWin(this.checkWinResult());
+                this.broadcastWin(WinUtil.checkWinResult(this.ignoreWinState, this.teamManager, this.hunterTeam.key(), this.runnerTeam.key(), this.end));
+                for (ServerPlayerEntity player : gameSpace.getPlayers()) {
+                    player.changeGameMode(GameMode.SPECTATOR);
+                }
                 return;
             case GAME_CLOSED:
                 this.gameSpace.close(GameCloseReason.FINISHED);
@@ -198,16 +202,13 @@ public class StevesManhuntMiniGameActive {
         }
 
         this.timerBar.update(this.stageManager.getFinishTime() - time, this.config.timeLimitSeconds() * TICKS_PER_SECOND);
-
-        // TODO tick logic
     }
 
-    private void broadcastWin(WinResult result) {
-        ServerPlayerEntity winningPlayer = result.getWinningPlayer();
-
+    private void broadcastWin(WinUtil.WinResult winResult) {
+        @Nullable var winningGameTeamKey = winResult.getWinningTeamKey();
         Text message;
-        if (winningPlayer != null) {
-            message = winningPlayer.getDisplayName().copy().append(" has won the game!").formatted(Formatting.GOLD);
+        if (winningGameTeamKey != null) {
+            message = this.teamManager.getTeamConfig(winningGameTeamKey).name().copy().append(" have won the game!").formatted(Formatting.GOLD);
         } else {
             message = Text.literal("The game ended, but nobody won!").formatted(Formatting.GOLD);
         }
@@ -215,43 +216,5 @@ public class StevesManhuntMiniGameActive {
         PlayerSet players = this.gameSpace.getPlayers();
         players.sendMessage(message);
         players.playSound(SoundEvents.ENTITY_VILLAGER_YES);
-    }
-
-    private WinResult checkWinResult() {
-        // For testing purposes: don't end the game if we only ever had one participant
-        if (this.ignoreWinState) {
-            return WinResult.no();
-        }
-
-        ServerPlayerEntity winningPlayer = null;
-
-        // TODO win result logic
-        return WinResult.no();
-    }
-
-    static class WinResult {
-        final ServerPlayerEntity winningPlayer;
-        final boolean win;
-
-        private WinResult(ServerPlayerEntity winningPlayer, boolean win) {
-            this.winningPlayer = winningPlayer;
-            this.win = win;
-        }
-
-        static WinResult no() {
-            return new WinResult(null, false);
-        }
-
-        static WinResult win(ServerPlayerEntity player) {
-            return new WinResult(player, true);
-        }
-
-        public boolean isWin() {
-            return this.win;
-        }
-
-        public ServerPlayerEntity getWinningPlayer() {
-            return this.winningPlayer;
-        }
     }
 }
