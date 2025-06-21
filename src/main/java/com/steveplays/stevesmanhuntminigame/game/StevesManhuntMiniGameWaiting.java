@@ -21,6 +21,7 @@ import xyz.nucleoid.plasmid.api.game.player.JoinOffer;
 import xyz.nucleoid.stimuli.event.player.PlayerDeathEvent;
 
 import static com.steveplays.stevesmanhuntminigame.util.WeatherUtil.MIN_TIME_UNTIL_WEATHER_CHANGE_TICKS;
+import com.steveplays.stevesmanhuntminigame.util.RuntimeWorldWithSpecialSpawners;
 import static com.steveplays.stevesmanhuntminigame.util.WeatherUtil.MAX_TIME_UNTIL_WEATHER_CHANGE_TICKS;
 
 public class StevesManhuntMiniGameWaiting {
@@ -48,8 +49,8 @@ public class StevesManhuntMiniGameWaiting {
             var random = Random.create();
             var seed = random.nextLong();
             var overworld = gameSpace.getWorlds()
-                    .add(new RuntimeWorldConfig().setSeed(seed).setGameRule(GameRules.DO_MOB_SPAWNING, true).setGenerator(server.getOverworld().getChunkManager().getChunkGenerator()).setTimeOfDay(0)
-                            .setShouldTickTime(true).setGameRule(GameRules.DO_WEATHER_CYCLE, true)
+                    .add(new RuntimeWorldConfig().setWorldConstructor(RuntimeWorldWithSpecialSpawners::createWorld).setSeed(seed).setGameRule(GameRules.DO_MOB_SPAWNING, true)
+                            .setGenerator(server.getOverworld().getChunkManager().getChunkGenerator()).setTimeOfDay(0).setShouldTickTime(true).setGameRule(GameRules.DO_WEATHER_CYCLE, true)
                             .setSunny(random.nextBetween(MIN_TIME_UNTIL_WEATHER_CHANGE_TICKS, MAX_TIME_UNTIL_WEATHER_CHANGE_TICKS)));
             var nether = gameSpace.getWorlds().add(new RuntimeWorldConfig().setSeed(seed).setGameRule(GameRules.DO_MOB_SPAWNING, true)
                     .setGenerator(server.getWorld(World.NETHER).getChunkManager().getChunkGenerator()).setDimensionType(DimensionTypes.THE_NETHER));
