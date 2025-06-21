@@ -7,6 +7,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import xyz.nucleoid.plasmid.api.game.GameCloseReason;
 import xyz.nucleoid.plasmid.api.game.GameSpace;
+import xyz.nucleoid.plasmid.api.game.GameSpaceManager;
 import xyz.nucleoid.plasmid.api.game.common.GlobalWidgets;
 import xyz.nucleoid.plasmid.api.game.common.team.GameTeam;
 import xyz.nucleoid.plasmid.api.game.common.team.GameTeamConfig;
@@ -19,8 +20,10 @@ import xyz.nucleoid.plasmid.api.game.player.PlayerSet;
 import xyz.nucleoid.plasmid.api.game.rule.GameRuleType;
 import xyz.nucleoid.plasmid.api.util.PlayerRef;
 import net.minecraft.block.pattern.BlockPattern.Result;
+import net.minecraft.entity.EntityStatuses;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.item.ItemUsageContext;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.scoreboard.AbstractTeam.CollisionRule;
 import net.minecraft.scoreboard.AbstractTeam.VisibilityRule;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -38,6 +41,7 @@ import static com.steveplays.stevesmanhuntminigame.util.TickUtil.TICKS_PER_SECON
 import java.util.*;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.Nullable;
+import com.steveplays.stevesmanhuntminigame.StevesManhuntMiniGame;
 import com.steveplays.stevesmanhuntminigame.util.WinUtil;
 
 public class StevesManhuntMiniGameActive {
@@ -158,9 +162,20 @@ public class StevesManhuntMiniGameActive {
     }
 
     private ActionResult onPlayerDeath(ServerPlayerEntity player, DamageSource source) {
-        // TODO: Fix beds allowing players to respawn in different game spaces
-        this.spawnParticipant(player);
-        return ActionResult.CONSUME;
+        var serverWorld = player.getServerWorld();
+        var playerRandom = player.getRandom();
+        for (int i = 0; i < 20; i++) {
+            serverWorld.spawnParticles(ParticleTypes.POOF, player.getParticleX(1d), player.getRandomBodyY(), player.getParticleZ(1d), 1, playerRandom.nextGaussian() * 0.02d,
+                    playerRandom.nextGaussian() * 0.02d, playerRandom.nextGaussian() * 0.02d, 0.02d);
+        }
+        player.getInventory().dropAll();
+        if (this.teamManager.teamFor(player).equals(this.runnerTeam.key())) {
+            this.spawnLogic.resetPlayer(player, GameMode.SPECTATOR);
+            return ActionResult.FAIL;
+        }
+
+        this.respawnParticipant(player);
+        return ActionResult.FAIL;
     }
 
     private ActionResult onNetherPortalOpen(ServerWorld serverworld1, BlockPos blockpos2) {
@@ -172,8 +187,13 @@ public class StevesManhuntMiniGameActive {
     }
 
     private void spawnParticipant(ServerPlayerEntity player) {
+        player.setSpawnPoint(this.overworld.getRegistryKey(), this.overworld.getSpawnPos(), this.overworld.getSpawnAngle(), true, false);
         this.spawnLogic.resetPlayer(player, GameMode.SURVIVAL);
         this.spawnLogic.spawnPlayer(player);
+    }
+
+    private void respawnParticipant(ServerPlayerEntity player) {
+        this.spawnLogic.respawnPlayer(player);
     }
 
     private void spawnSpectator(ServerPlayerEntity player) {
