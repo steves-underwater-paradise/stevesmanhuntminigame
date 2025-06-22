@@ -125,7 +125,7 @@ public class StevesManhuntMiniGameStageManager {
                         participantIsHunter
                                 ? Text.translatable(String.format("%s.team.%s.description_0", MOD_ID, HUNTERS_TEAM_ID)).append(" ").append(TeamUtil.getTeamNameStyled(RUNNERS_TEAM_ID)).append(" ")
                                         .append(Text.translatable(String.format("%s.team.%s.description_1", MOD_ID, HUNTERS_TEAM_ID)))
-                                : Text.translatable(String.format("%s.team.%s.description_0", MOD_ID, RUNNERS_TEAM_ID)).append(" ").append(TeamUtil.getTeamNameStyled(HUNTERS_TEAM_ID)).append(" ")
+                                : Text.translatable(String.format("%s.team.%s.description_0", MOD_ID, RUNNERS_TEAM_ID)).append(" ").append(TeamUtil.getTeamNameStyled(HUNTERS_TEAM_ID))
                                         .append(Text.translatable(String.format("%s.team.%s.description_1", MOD_ID, RUNNERS_TEAM_ID))),
                         5, ROLE_REVEAL_LENGTH_SECONDS * TICKS_PER_SECOND - 5, 0);
                 participant.playSoundToPlayer(SoundEvents.BLOCK_NOTE_BLOCK_CHIME.value(), SoundCategory.PLAYERS, 0.5f, 0.5f);
