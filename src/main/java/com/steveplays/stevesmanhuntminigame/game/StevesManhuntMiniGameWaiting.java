@@ -18,6 +18,7 @@ import xyz.nucleoid.plasmid.api.game.common.GameWaitingLobby;
 import xyz.nucleoid.plasmid.api.game.event.GameActivityEvents;
 import xyz.nucleoid.plasmid.api.game.event.GamePlayerEvents;
 import xyz.nucleoid.plasmid.api.game.player.JoinOffer;
+import xyz.nucleoid.stimuli.event.player.PlayerDamageEvent;
 import xyz.nucleoid.stimuli.event.player.PlayerDeathEvent;
 
 import static com.steveplays.stevesmanhuntminigame.util.WeatherUtil.MIN_TIME_UNTIL_WEATHER_CHANGE_TICKS;
@@ -71,6 +72,7 @@ public class StevesManhuntMiniGameWaiting {
             game.listen(GamePlayerEvents.ADD, waiting::addPlayer);
             game.listen(GamePlayerEvents.OFFER, JoinOffer::accept);
             game.listen(GamePlayerEvents.ACCEPT, joinAcceptor -> joinAcceptor.teleport(overworld, Vec3d.ZERO));
+            game.listen(PlayerDamageEvent.EVENT, waiting::onPlayerDamage);
             game.listen(PlayerDeathEvent.EVENT, waiting::onPlayerDeath);
         });
     }
@@ -80,19 +82,23 @@ public class StevesManhuntMiniGameWaiting {
         return GameResult.ok();
     }
 
-    private void addPlayer(ServerPlayerEntity player) {
-        this.spawnPlayer(player);
-        WorldBorderUtil.WarnInChatToServerAdministratorIfMultiWorldBordersIsNotInstalled(player);
+    private void addPlayer(ServerPlayerEntity serverPlayer) {
+        this.spawnPlayer(serverPlayer);
+        WorldBorderUtil.WarnInChatToServerAdministratorIfMultiWorldBordersIsNotInstalled(serverPlayer);
     }
 
-    private ActionResult onPlayerDeath(ServerPlayerEntity player, DamageSource source) {
-        player.setHealth(20.0f);
-        this.spawnPlayer(player);
+    private ActionResult onPlayerDeath(ServerPlayerEntity serverPlayer, DamageSource source) {
+        serverPlayer.setHealth(20.0f);
+        this.spawnPlayer(serverPlayer);
         return ActionResult.FAIL;
     }
 
-    private void spawnPlayer(ServerPlayerEntity player) {
-        this.spawnLogic.resetPlayer(player, GameMode.ADVENTURE);
-        this.spawnLogic.spawnPlayer(player);
+    private ActionResult onPlayerDamage(ServerPlayerEntity serverPlayer, DamageSource damageSource, float damage) {
+        return ActionResult.FAIL;
+    }
+
+    private void spawnPlayer(ServerPlayerEntity serverPlayer) {
+        this.spawnLogic.resetPlayer(serverPlayer, GameMode.ADVENTURE);
+        this.spawnLogic.spawnPlayer(serverPlayer);
     }
 }
