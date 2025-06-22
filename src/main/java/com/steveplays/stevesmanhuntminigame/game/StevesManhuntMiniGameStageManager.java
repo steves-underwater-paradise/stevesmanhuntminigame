@@ -77,7 +77,7 @@ public class StevesManhuntMiniGameStageManager {
                     state.lastPos = player.getPos();
                 }
 
-                player.networkHandler.requestTeleport(state.lastPos.getX(), state.lastPos.getY(), state.lastPos.getZ(), 0f, 0f, ImmutableSet.of(PositionFlag.X_ROT, PositionFlag.Y_ROT));
+                player.networkHandler.requestTeleport(state.lastPos.getX(), state.lastPos.getY(), state.lastPos.getZ(), player.getYaw(), player.getPitch(), ImmutableSet.of(PositionFlag.X_ROT, PositionFlag.Y_ROT));
             }
         }
 
