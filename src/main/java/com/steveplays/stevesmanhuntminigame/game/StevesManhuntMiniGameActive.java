@@ -49,7 +49,7 @@ public class StevesManhuntMiniGameActive {
     public final GameSpace gameSpace;
 
     private final ServerWorld overworld;
-    private final ServerWorld nether;
+    @SuppressWarnings("unused") private final ServerWorld nether;
     private final ServerWorld end;
     private final StevesManhuntMiniGameConfig config;
     private final Object2ObjectMap<PlayerRef, StevesManhuntMiniGamePlayer> participants;
@@ -66,7 +66,7 @@ public class StevesManhuntMiniGameActive {
             StevesManhuntMiniGameConfig config, Set<PlayerRef> participants) {
         this.gameSpace = gameSpace;
         this.config = config;
-        this.spawnLogic = new StevesManhuntMiniGameSpawnLogic(gameSpace, overworld, config.mapConfig().spawnRadius);
+        this.spawnLogic = new StevesManhuntMiniGameSpawnLogic(overworld, config.mapConfig().spawnRadius);
         this.participants = new Object2ObjectOpenHashMap<>();
         this.overworld = overworld;
         this.nether = nether;

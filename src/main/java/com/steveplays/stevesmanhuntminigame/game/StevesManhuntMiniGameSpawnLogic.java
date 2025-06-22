@@ -1,7 +1,6 @@
 package com.steveplays.stevesmanhuntminigame.game;
 
 import net.minecraft.util.math.Vec3d;
-import xyz.nucleoid.plasmid.api.game.GameSpace;
 import xyz.nucleoid.plasmid.api.game.GameSpaceManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -13,12 +12,10 @@ import java.util.Set;
 import com.steveplays.stevesmanhuntminigame.util.PlayerUtil;
 
 public class StevesManhuntMiniGameSpawnLogic {
-    private final GameSpace gameSpace;
     private final ServerWorld overworld;
     private final int spawnRadius;
 
-    public StevesManhuntMiniGameSpawnLogic(GameSpace gameSpace, ServerWorld overworld, int spawnRadius) {
-        this.gameSpace = gameSpace;
+    public StevesManhuntMiniGameSpawnLogic(ServerWorld overworld, int spawnRadius) {
         this.overworld = overworld;
         this.spawnRadius = spawnRadius;
     }
