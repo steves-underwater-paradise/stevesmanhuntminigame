@@ -36,22 +36,65 @@ public final class StevesManhuntMiniGameSidebar {
     private static final @NotNull Text SIDEBAR_WIDGET_TITLE = Text.translatable("gametype.stevesmanhuntminigame.stevesmanhuntminigame").styled(style -> style.withBold(true));
     private static final @NotNull Text[] COMPASS = new Text[] {Text.literal("    ███"), Text.literal("  █      █"), Text.literal("█          █"), Text.literal("█    █    █"),
             Text.literal("█          █"), Text.literal("  █      █"), Text.literal("    ███")};
-    private static final @NotNull Text[] COMPASS_NORTH = new Text[] {Text.literal("    ███"), Text.literal("  █  █  █"), Text.literal("█    █    █"), Text.literal("█    █    █"),
-            Text.literal("█    █    █"), Text.literal("  █      █"), Text.literal("    ███")};
-    private static final @NotNull Text[] COMPASS_NORTH_EAST = new Text[] {Text.literal("    ███"), Text.literal("  █      █"), Text.literal("█      █  █"), Text.literal("█    █    █"),
-            Text.literal("█  █      █"), Text.literal("  █      █"), Text.literal("    ███")};
-    private static final @NotNull Text[] COMPASS_EAST = new Text[] {Text.literal("    ███"), Text.literal("  █      █"), Text.literal("█          █"), Text.literal("█  ████"),
-            Text.literal("█          █"), Text.literal("  █      █"), Text.literal("    ███")};
-    private static final @NotNull Text[] COMPASS_SOUTH_EAST = new Text[] {Text.literal("    ███"), Text.literal("  █      █"), Text.literal("█  █      █"), Text.literal("█    █    █"),
-            Text.literal("█      █  █"), Text.literal("  █      █"), Text.literal("    ███")};
-    private static final @NotNull Text[] COMPASS_SOUTH = new Text[] {Text.literal("    ███"), Text.literal("  █      █"), Text.literal("█    █    █"), Text.literal("█    █    █"),
-            Text.literal("█    █    █"), Text.literal("  █  █  █"), Text.literal("    ███")};
-    private static final @NotNull Text[] COMPASS_SOUTH_WEST = new Text[] {Text.literal("    ███"), Text.literal("  █      █"), Text.literal("█      █  █"), Text.literal("█    █    █"),
-            Text.literal("█  █      █"), Text.literal("  █      █"), Text.literal("    ███")};
-    private static final @NotNull Text[] COMPASS_WEST = new Text[] {Text.literal("    ███"), Text.literal("  █      █"), Text.literal("█          █"), Text.literal("█████  █"),
-            Text.literal("█          █"), Text.literal("  █      █"), Text.literal("    ███")};
-    private static final @NotNull Text[] COMPASS_NORTH_WEST = new Text[] {Text.literal("    ███"), Text.literal("  █      █"), Text.literal("█  █      █"), Text.literal("█    █    █"),
-            Text.literal("█      █  █"), Text.literal("  █      █"), Text.literal("    ███")};
+    private static final @NotNull Text[] COMPASS_NORTH = new Text[] {Text.literal("    ███").styled(style -> style.withColor(Formatting.GRAY)),
+            Text.literal("  █  ").styled(style -> style.withColor(Formatting.GRAY)).append(Text.literal("█").styled(style -> style.withColor(Formatting.RED)))
+                    .append(Text.literal("  █").styled(style -> style.withColor(Formatting.GRAY))),
+            Text.literal("█    ").styled(style -> style.withColor(Formatting.GRAY)).append(Text.literal("█").styled(style -> style.withColor(Formatting.RED)))
+                    .append(Text.literal("    █").styled(style -> style.withColor(Formatting.GRAY))),
+            Text.literal("█    ").styled(style -> style.withColor(Formatting.GRAY)).append(Text.literal("█").styled(style -> style.withColor(Formatting.RED)))
+                    .append(Text.literal("    █").styled(style -> style.withColor(Formatting.GRAY))),
+            Text.literal("█    █    █").styled(style -> style.withColor(Formatting.GRAY)), Text.literal("  █      █").styled(style -> style.withColor(Formatting.GRAY)),
+            Text.literal("    ███").styled(style -> style.withColor(Formatting.GRAY))};
+    private static final @NotNull Text[] COMPASS_NORTH_EAST =
+            new Text[] {Text.literal("    ███").styled(style -> style.withColor(Formatting.GRAY)), Text.literal("  █      █").styled(style -> style.withColor(Formatting.GRAY)),
+                    Text.literal("█      ").styled(style -> style.withColor(Formatting.GRAY)).append(Text.literal("█").styled(style -> style.withColor(Formatting.RED)))
+                            .append(Text.literal("  █").styled(style -> style.withColor(Formatting.GRAY))),
+                    Text.literal("█    ").styled(style -> style.withColor(Formatting.GRAY)).append(Text.literal("█").styled(style -> style.withColor(Formatting.RED)))
+                            .append(Text.literal("    █").styled(style -> style.withColor(Formatting.GRAY))),
+                    Text.literal("█  █      █").styled(style -> style.withColor(Formatting.GRAY)), Text.literal("  █      █").styled(style -> style.withColor(Formatting.GRAY)),
+                    Text.literal("    ███").styled(style -> style.withColor(Formatting.GRAY))};
+    private static final @NotNull Text[] COMPASS_EAST = new Text[] {Text.literal("    ███").styled(style -> style.withColor(Formatting.GRAY)),
+            Text.literal("  █      █").styled(style -> style.withColor(Formatting.GRAY)), Text.literal("█          █").styled(style -> style.withColor(Formatting.GRAY)),
+            Text.literal("█  █").styled(style -> style.withColor(Formatting.GRAY)).append(Text.literal("███").styled(style -> style.withColor(Formatting.RED))),
+            Text.literal("█          █").styled(style -> style.withColor(Formatting.GRAY)), Text.literal("  █      █").styled(style -> style.withColor(Formatting.GRAY)),
+            Text.literal("    ███").styled(style -> style.withColor(Formatting.GRAY))};
+    private static final @NotNull Text[] COMPASS_SOUTH_EAST = new Text[] {Text.literal("    ███").styled(style -> style.withColor(Formatting.GRAY)),
+            Text.literal("  █      █").styled(style -> style.withColor(Formatting.GRAY)), Text.literal("█  █      █").styled(style -> style.withColor(Formatting.GRAY)),
+            Text.literal("█    ").styled(style -> style.withColor(Formatting.GRAY)).append(Text.literal("█").styled(style -> style.withColor(Formatting.RED)))
+                    .append(Text.literal("    █").styled(style -> style.withColor(Formatting.GRAY))),
+            Text.literal("█      ").styled(style -> style.withColor(Formatting.GRAY)).append(Text.literal("█").styled(style -> style.withColor(Formatting.RED)))
+                    .append(Text.literal("  █").styled(style -> style.withColor(Formatting.GRAY))),
+            Text.literal("  █      █").styled(style -> style.withColor(Formatting.GRAY)), Text.literal("    ███").styled(style -> style.withColor(Formatting.GRAY))};
+    private static final @NotNull Text[] COMPASS_SOUTH = new Text[] {Text.literal("    ███").styled(style -> style.withColor(Formatting.GRAY)),
+            Text.literal("  █      █").styled(style -> style.withColor(Formatting.GRAY)), Text.literal("█    █    █").styled(style -> style.withColor(Formatting.GRAY)),
+            Text.literal("█    ").styled(style -> style.withColor(Formatting.GRAY)).append(Text.literal("█").styled(style -> style.withColor(Formatting.RED)))
+                    .append(Text.literal("    █").styled(style -> style.withColor(Formatting.GRAY))),
+            Text.literal("█    ").styled(style -> style.withColor(Formatting.GRAY)).append(Text.literal("█").styled(style -> style.withColor(Formatting.RED)))
+                    .append(Text.literal("    █").styled(style -> style.withColor(Formatting.GRAY))),
+            Text.literal("  █  ").styled(style -> style.withColor(Formatting.GRAY)).append(Text.literal("█").styled(style -> style.withColor(Formatting.RED)))
+                    .append(Text.literal("  █").styled(style -> style.withColor(Formatting.GRAY))),
+            Text.literal("    ███").styled(style -> style.withColor(Formatting.GRAY))};
+    private static final @NotNull Text[] COMPASS_SOUTH_WEST = new Text[] {Text.literal("    ███").styled(style -> style.withColor(Formatting.GRAY)),
+            Text.literal("  █      █").styled(style -> style.withColor(Formatting.GRAY)), Text.literal("█      █  █").styled(style -> style.withColor(Formatting.GRAY)),
+            Text.literal("█    ").styled(style -> style.withColor(Formatting.GRAY)).append(Text.literal("█").styled(style -> style.withColor(Formatting.RED)))
+                    .append(Text.literal("    █").styled(style -> style.withColor(Formatting.GRAY))),
+            Text.literal("█  ").styled(style -> style.withColor(Formatting.GRAY)).append(Text.literal("█").styled(style -> style.withColor(Formatting.RED)))
+                    .append(Text.literal("      █").styled(style -> style.withColor(Formatting.GRAY))),
+            Text.literal("  █      █").styled(style -> style.withColor(Formatting.GRAY)), Text.literal("    ███").styled(style -> style.withColor(Formatting.GRAY))};
+    private static final @NotNull Text[] COMPASS_WEST = new Text[] {Text.literal("    ███").styled(style -> style.withColor(Formatting.GRAY)),
+            Text.literal("  █      █").styled(style -> style.withColor(Formatting.GRAY)), Text.literal("█          █").styled(style -> style.withColor(Formatting.GRAY)),
+            Text.literal("█").styled(style -> style.withColor(Formatting.GRAY)).append(Text.literal("███").styled(style -> style.withColor(Formatting.RED)))
+                    .append(Text.literal("█  █").styled(style -> style.withColor(Formatting.GRAY))),
+            Text.literal("█          █").styled(style -> style.withColor(Formatting.GRAY)), Text.literal("  █      █").styled(style -> style.withColor(Formatting.GRAY)),
+            Text.literal("    ███").styled(style -> style.withColor(Formatting.GRAY))};
+    private static final @NotNull Text[] COMPASS_NORTH_WEST =
+            new Text[] {Text.literal("    ███").styled(style -> style.withColor(Formatting.GRAY)), Text.literal("  █      █").styled(style -> style.withColor(Formatting.GRAY)),
+                    Text.literal("█  ").styled(style -> style.withColor(Formatting.GRAY)).append(Text.literal("█").styled(style -> style.withColor(Formatting.RED)))
+                            .append(Text.literal("      █").styled(style -> style.withColor(Formatting.GRAY))),
+                    Text.literal("█    ").styled(style -> style.withColor(Formatting.GRAY)).append(Text.literal("█").styled(style -> style.withColor(Formatting.RED)))
+                            .append(Text.literal("    █").styled(style -> style.withColor(Formatting.GRAY))),
+                    Text.literal("█      █  █").styled(style -> style.withColor(Formatting.GRAY)), Text.literal("  █      █").styled(style -> style.withColor(Formatting.GRAY)),
+                    Text.literal("    ███").styled(style -> style.withColor(Formatting.GRAY))};
 
     private Map<UUID, SidebarWidget> hunterSidebarWidgets = new HashMap<>();
     private SidebarWidget runnerSidebarWidget;
