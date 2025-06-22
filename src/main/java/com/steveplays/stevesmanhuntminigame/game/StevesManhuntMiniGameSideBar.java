@@ -123,6 +123,10 @@ public final class StevesManhuntMiniGameSidebar {
                 float closestRunnerDistance = Float.MAX_VALUE;
                 @Nullable ServerPlayerEntity closestRunner = null;
                 for (var runner : runners) {
+                    if (runner.isSpectator()) {
+                        continue;
+                    }
+
                     if (closestRunner == null) {
                         closestRunner = runner;
                     }
