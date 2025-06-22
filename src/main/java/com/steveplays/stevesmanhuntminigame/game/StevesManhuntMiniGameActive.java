@@ -135,9 +135,12 @@ public class StevesManhuntMiniGameActive {
             participants.add(participant);
         }
 
+        var participantsWithoutTeamAssigned = new ArrayList<>(participants);
         var random = Random.create();
-        for (int i = 0; i < Math.clamp((int) Math.round(participants.size() * this.config.getHuntersTeamRatioPercent()), 1, Integer.MAX_VALUE); i++) {
-            this.teamManager.addPlayerTo(participants.get(random.nextInt(participants.size())), this.hunterTeam.key());
+        for (int i = 0; i < Math.clamp((int) Math.round(((float) participants.size()) * this.config.getHuntersTeamRatioPercent()), 1, Integer.MAX_VALUE); i++) {
+            var participantsWithoutTeamAssignedIndex = random.nextInt(participantsWithoutTeamAssigned.size());
+            this.teamManager.addPlayerTo(participantsWithoutTeamAssigned.get(participantsWithoutTeamAssignedIndex), this.hunterTeam.key());
+            participantsWithoutTeamAssigned.remove(participantsWithoutTeamAssignedIndex);
         }
 
         for (var participant : this.gameSpace.getPlayers().participants()) {

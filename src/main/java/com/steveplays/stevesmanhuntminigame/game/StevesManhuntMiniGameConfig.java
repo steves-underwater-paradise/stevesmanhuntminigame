@@ -33,6 +33,7 @@ public class StevesManhuntMiniGameConfig {
         this.mapConfig = mapConfig;
         this.timeLimitSeconds = timeLimitSeconds;
         this.playerNameTagVisibilityRuleRaw = playerNameTagVisibilityRuleRaw;
+        this.huntersTeamRatioPercent = huntersTeamRatioPercent;
     }
 
     public WaitingLobbyConfig getPlayers() {
