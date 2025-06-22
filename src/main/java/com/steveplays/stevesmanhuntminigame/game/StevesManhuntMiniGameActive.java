@@ -170,7 +170,7 @@ public class StevesManhuntMiniGameActive {
         this.participants.remove(PlayerRef.of(player));
     }
 
-    private ActionResult onPlayerDeath(ServerPlayerEntity player, DamageSource source) {
+    private ActionResult onPlayerDeath(ServerPlayerEntity player, DamageSource damageSource) {
         var serverWorld = player.getServerWorld();
         var playerRandom = player.getRandom();
         for (int i = 0; i < 20; i++) {
@@ -183,7 +183,7 @@ public class StevesManhuntMiniGameActive {
             return ActionResult.FAIL;
         }
 
-        this.respawnParticipant(player);
+        this.respawnParticipant(player, damageSource);
         return ActionResult.FAIL;
     }
 
@@ -201,13 +201,15 @@ public class StevesManhuntMiniGameActive {
         this.spawnLogic.spawnPlayer(player);
     }
 
-    private void respawnParticipant(ServerPlayerEntity player) {
+    private void respawnParticipant(ServerPlayerEntity player, DamageSource damageSource) {
         this.spawnLogic.respawnPlayer(player);
-        player.getInventory().insertStack(Items.STONE_SWORD.getDefaultStack());
-        player.getInventory().insertStack(Items.STONE_PICKAXE.getDefaultStack());
-        player.getInventory().insertStack(Items.STONE_AXE.getDefaultStack());
-        player.getInventory().insertStack(Items.STONE_SHOVEL.getDefaultStack());
-        player.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 120, 1));
+        if (damageSource.getAttacker() != null) {
+            player.getInventory().insertStack(Items.STONE_SWORD.getDefaultStack());
+            player.getInventory().insertStack(Items.STONE_PICKAXE.getDefaultStack());
+            player.getInventory().insertStack(Items.STONE_AXE.getDefaultStack());
+            player.getInventory().insertStack(Items.STONE_SHOVEL.getDefaultStack());
+            player.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 120 * TICKS_PER_SECOND, 0));
+        }
     }
 
     private void spawnSpectator(ServerPlayerEntity player) {
