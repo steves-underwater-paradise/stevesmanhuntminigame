@@ -38,7 +38,7 @@ public class StevesManhuntMiniGameSpawnLogic {
         var spawnPosition = BlockPos.ofFloored(overworldWorldBorder.getCenterX() + MathHelper.nextFloat(playerRandom, -this.spawnRadius, this.spawnRadius), 0.0,
                 overworldWorldBorder.getCenterZ() + MathHelper.nextFloat(playerRandom, -this.spawnRadius, this.spawnRadius));
         spawnPosition = this.overworld.getTopPosition(Heightmap.Type.MOTION_BLOCKING, spawnPosition);
-        player.teleport(this.overworld, spawnPosition.getX(), spawnPosition.getY(), spawnPosition.getZ(), Set.of(), this.overworld.getSpawnAngle(), 0f);
+        player.teleport(this.overworld, spawnPosition.getX() + 0.5f, spawnPosition.getY(), spawnPosition.getZ() + 0.5f, Set.of(), this.overworld.getSpawnAngle(), 0f);
     }
 
     public void respawnPlayer(ServerPlayerEntity player) {
