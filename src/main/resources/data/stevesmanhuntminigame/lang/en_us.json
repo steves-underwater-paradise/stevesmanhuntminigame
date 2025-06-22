@@ -19,7 +19,8 @@
 	"stevesmanhuntminigame.distance": "Distance",
 	"stevesmanhuntminigame.meters_suffix": "m",
 	"stevesmanhuntminigame.direction": "Direction",
-	"stevesmanhuntminigame.all_enemy_players_are_in_another_dimension": "All %s are in another dimension.",
+	"stevesmanhuntminigame.all_enemy_players_are_in_another_dimension_0": "All",
+	"stevesmanhuntminigame.all_enemy_players_are_in_another_dimension_1": "are in another dimension.",
 	"stevesmanhuntminigame.game_ended_with_winner": "%s have won the game!",
 	"stevesmanhuntminigame.game_ended_without_winner": "The game ended, but nobody won."
 }

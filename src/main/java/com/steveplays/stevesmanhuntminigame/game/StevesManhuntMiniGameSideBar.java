@@ -155,8 +155,9 @@ public final class StevesManhuntMiniGameSidebar {
                                                 / 360d));
                                 hunterSidebarWidget.addLines(getCompassWithDirectionIndicator(directionToRunnerAngle));
                         } else {
-                                hunterSidebarWidget
-                                                .addLines(Text.translatable(String.format("%s.all_enemy_players_are_in_another_dimension", MOD_ID), TeamUtil.getTeamNamePrefixStyled(RUNNERS_TEAM_ID)));
+                                hunterSidebarWidget.addLines(Text.translatable(String.format("%s.all_enemy_players_are_in_another_dimension_0", MOD_ID)).append(" ")
+                                                .append(TeamUtil.getTeamNameStyled(RUNNERS_TEAM_ID)).append(" ")
+                                                .append(Text.translatable(String.format("%s.all_enemy_players_are_in_another_dimension_1", MOD_ID))));
                         }
                 }
 
