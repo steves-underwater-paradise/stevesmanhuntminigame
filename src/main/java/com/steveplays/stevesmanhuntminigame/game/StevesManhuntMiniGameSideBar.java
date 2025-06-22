@@ -69,7 +69,6 @@ public final class StevesManhuntMiniGameSidebar {
     }
 
     public void update(long ticksUntilEnd, long totalTicksUntilEnd, TeamManager teamManager, GameTeamKey hunterTeamKey, GameTeamKey runnerTeamKey) {
-        // TODO: Replace literal text with translatable text
         for (var hunter : teamManager.playersIn(hunterTeamKey)) {
             var hunterSidebarWidget = hunterSidebarWidgets.get(hunter.getUuid());
             hunterSidebarWidget.clearLines();
