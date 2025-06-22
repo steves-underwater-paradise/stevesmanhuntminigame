@@ -52,8 +52,8 @@ public class StevesManhuntMiniGameWaiting {
             var overworld = gameSpace.getWorlds()
                     .add(new RuntimeWorldConfig().setWorldConstructor(RuntimeWorldWithSpecialSpawners::createWorld).setSeed(seed).setGameRule(GameRules.DO_MOB_SPAWNING, true)
                             .setGameRule(GameRules.ANNOUNCE_ADVANCEMENTS, true).setGameRule(GameRules.SHOW_DEATH_MESSAGES, false)
-                            .setGenerator(server.getOverworld().getChunkManager().getChunkGenerator()).setTimeOfDay(0).setShouldTickTime(true).setGameRule(GameRules.DO_WEATHER_CYCLE, true)
-                            .setSunny(random.nextBetween(MIN_TIME_UNTIL_WEATHER_CHANGE_TICKS, MAX_TIME_UNTIL_WEATHER_CHANGE_TICKS)));
+                            .setGenerator(server.getOverworld().getChunkManager().getChunkGenerator()).setDimensionType(DimensionTypes.OVERWORLD).setTimeOfDay(0).setShouldTickTime(true)
+                            .setGameRule(GameRules.DO_WEATHER_CYCLE, true).setSunny(random.nextBetween(MIN_TIME_UNTIL_WEATHER_CHANGE_TICKS, MAX_TIME_UNTIL_WEATHER_CHANGE_TICKS)));
             var nether = gameSpace.getWorlds().add(new RuntimeWorldConfig().setSeed(seed).setGameRule(GameRules.DO_MOB_SPAWNING, true).setGameRule(GameRules.ANNOUNCE_ADVANCEMENTS, true)
                     .setGameRule(GameRules.SHOW_DEATH_MESSAGES, false).setGenerator(server.getWorld(World.NETHER).getChunkManager().getChunkGenerator()).setDimensionType(DimensionTypes.THE_NETHER));
             var end = gameSpace.getWorlds().add(new RuntimeWorldConfig().setSeed(seed).setGameRule(GameRules.DO_MOB_SPAWNING, true).setGameRule(GameRules.ANNOUNCE_ADVANCEMENTS, true)
