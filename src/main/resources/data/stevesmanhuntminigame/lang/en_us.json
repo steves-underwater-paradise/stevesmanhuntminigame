@@ -1,8 +1,9 @@
 {
-	"gametype.stevesmanhuntminigame.stevesmanhuntminigame": "Manhunt",
+	"gameType.stevesmanhuntminigame.stevesmanhuntminigame": "Manhunt",
 	"stevesmanhuntminigame.only_server_administrators_can_see_this_message": "Only server administrators can see this message:",
 	"stevesmanhuntminigame.multi_world_borders_not_installed_warning": "Multi World Borders by PotatoPresident (mod ID: multiworldborders) is not installed. World borders may not be set correctly.\nDownload:\n- GitHub: https://github.com/PotatoPresident/worldborderfixer\n- Modrinth: https://modrinth.com/mod/worldborderfix\n- CurseForge: https://www.curseforge.com/minecraft/mc-mods/world-border-fix",
 	"stevesmanhuntminigame.your_role": "You are a",
+	"stevesmanhuntminigame.do_not_disclose_your_role": "Do not disclose your role.",
 	"stevesmanhuntminigame.team.hunters.name": "Hunters",
 	"stevesmanhuntminigame.team.hunters.prefix": "Hunter",
 	"stevesmanhuntminigame.team.hunters.description_0": "Eliminate or stall all",

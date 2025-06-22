@@ -11,6 +11,10 @@ public class TeamUtil {
 	public static final @NotNull String HUNTERS_TEAM_ID = "hunters";
 	public static final @NotNull String RUNNERS_TEAM_ID = "runners";
 
+	public static @NotNull Text getTeamName(@NotNull String teamId) {
+		return Text.translatable(String.format("%s.team.%s.name", MOD_ID, teamId));
+	}
+
 	public static @NotNull Text getTeamNameStyled(@NotNull String teamId) {
 		return Text.translatable(String.format("%s.team.%s.name", MOD_ID, teamId)).styled(style -> TeamUtil.getStyleForTeam(teamId));
 	}

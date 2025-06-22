@@ -44,7 +44,7 @@ public class StevesManhuntMiniGameStageManager {
     public void onOpen(long time, StevesManhuntMiniGameConfig config) {
         this.roleRevealEndTime = time - (time % TICKS_PER_SECOND) + (ROLE_REVEAL_LENGTH_SECONDS * TICKS_PER_SECOND) + 19;
         this.startTime = roleRevealEndTime - (roleRevealEndTime % TICKS_PER_SECOND) + (START_COUNTDOWN_LENGTH_SECONDS * TICKS_PER_SECOND) + 19;
-        this.finishTime = this.startTime + (config.timeLimitSeconds() * TICKS_PER_SECOND);
+        this.finishTime = this.startTime + (config.getTimeLimitSeconds() * TICKS_PER_SECOND);
     }
 
     public long getFinishTime() {

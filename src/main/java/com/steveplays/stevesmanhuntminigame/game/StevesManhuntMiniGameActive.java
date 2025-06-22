@@ -29,6 +29,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.DyeColor;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.GameMode;
 import xyz.nucleoid.stimuli.event.player.PlayerDeathEvent;
@@ -66,7 +67,7 @@ public class StevesManhuntMiniGameActive {
             StevesManhuntMiniGameConfig config, Set<PlayerRef> participants) {
         this.gameSpace = gameSpace;
         this.config = config;
-        this.spawnLogic = new StevesManhuntMiniGameSpawnLogic(overworld, config.mapConfig().spawnRadius);
+        this.spawnLogic = new StevesManhuntMiniGameSpawnLogic(overworld, config.getMapConfig().spawnRadius);
         this.participants = new Object2ObjectOpenHashMap<>();
         this.overworld = overworld;
         this.nether = nether;
@@ -81,10 +82,16 @@ public class StevesManhuntMiniGameActive {
         this.widgets = widgets;
         this.teamManager = teamManager;
 
-        this.hunterTeam = new GameTeam(new GameTeamKey(HUNTERS_TEAM_ID), new GameTeamConfig(TeamUtil.getTeamNameStyled(HUNTERS_TEAM_ID), TeamUtil.getColorForTeam(HUNTERS_TEAM_ID), true,
-                CollisionRule.ALWAYS, VisibilityRule.ALWAYS, TeamUtil.getTeamNamePrefixStyled(HUNTERS_TEAM_ID).copy().append(" "), Text.empty()));
-        this.runnerTeam = new GameTeam(new GameTeamKey(RUNNERS_TEAM_ID), new GameTeamConfig(TeamUtil.getTeamNameStyled(RUNNERS_TEAM_ID), TeamUtil.getColorForTeam(RUNNERS_TEAM_ID), true,
-                CollisionRule.ALWAYS, VisibilityRule.ALWAYS, Text.empty(), Text.empty()));
+        var playerNameTagVisibilityRule = config.getPlayerNameTagVisibilityRule();
+        var showPlayerRoles = playerNameTagVisibilityRule.equals(VisibilityRule.ALWAYS);
+        this.hunterTeam = new GameTeam(new GameTeamKey(HUNTERS_TEAM_ID),
+                new GameTeamConfig(showPlayerRoles ? TeamUtil.getTeamNameStyled(HUNTERS_TEAM_ID) : TeamUtil.getTeamName(HUNTERS_TEAM_ID),
+                        showPlayerRoles ? TeamUtil.getColorForTeam(HUNTERS_TEAM_ID) : GameTeamConfig.Colors.from(DyeColor.WHITE), true, CollisionRule.ALWAYS, playerNameTagVisibilityRule,
+                        showPlayerRoles ? TeamUtil.getTeamNamePrefixStyled(HUNTERS_TEAM_ID).copy().append(" ") : Text.empty(), Text.empty()));
+        this.runnerTeam = new GameTeam(new GameTeamKey(RUNNERS_TEAM_ID),
+                new GameTeamConfig(showPlayerRoles ? TeamUtil.getTeamNameStyled(RUNNERS_TEAM_ID) : TeamUtil.getTeamName(RUNNERS_TEAM_ID),
+                        showPlayerRoles ? TeamUtil.getColorForTeam(RUNNERS_TEAM_ID) : GameTeamConfig.Colors.from(DyeColor.WHITE), true, CollisionRule.ALWAYS, playerNameTagVisibilityRule, Text.empty(),
+                        Text.empty()));
 
         this.timerBar = new StevesManhuntMiniGameSidebar();
     }
@@ -202,7 +209,8 @@ public class StevesManhuntMiniGameActive {
 
     private void tick() {
         long time = this.overworld.getTime();
-        this.timerBar.update(this.stageManager.getFinishTime() - time, this.config.timeLimitSeconds() * TICKS_PER_SECOND, this.teamManager, this.hunterTeam.key(), this.runnerTeam.key());
+        this.timerBar.update(this.stageManager.getFinishTime() - time, this.config.getTimeLimitSeconds() * TICKS_PER_SECOND, this.config, this.teamManager, this.hunterTeam.key(),
+                this.runnerTeam.key());
 
         StevesManhuntMiniGameStageManager.IdleTickResult result =
                 this.stageManager.tick(time, this.gameSpace, this.teamManager, this.hunterTeam.key(), this.runnerTeam.key(), this.ignoreWinState, this.end);

@@ -39,7 +39,7 @@ public class StevesManhuntMiniGameWaiting {
         this.overworld = overworld;
         this.nether = nether;
         this.end = end;
-        this.spawnLogic = new StevesManhuntMiniGameSpawnLogic(overworld, config.mapConfig().spawnRadius);
+        this.spawnLogic = new StevesManhuntMiniGameSpawnLogic(overworld, config.getMapConfig().spawnRadius);
     }
 
     @SuppressWarnings("deprecation")
@@ -62,12 +62,13 @@ public class StevesManhuntMiniGameWaiting {
             WorldBorderUtil.WarnInLogIfMultiWorldBordersIsNotInstalled();
 
             var config = context.config();
-            overworld.getWorldBorder().setSize(config.mapConfig().size);
-            nether.getWorldBorder().setSize(config.mapConfig().size);
-            end.getWorldBorder().setSize(config.mapConfig().size);
+            var mapSize = config.getMapConfig().size;
+            overworld.getWorldBorder().setSize(mapSize);
+            nether.getWorldBorder().setSize(mapSize);
+            end.getWorldBorder().setSize(mapSize);
 
             StevesManhuntMiniGameWaiting waiting = new StevesManhuntMiniGameWaiting(gameSpace, overworld, nether, end, config);
-            GameWaitingLobby.addTo(game, config.players());
+            GameWaitingLobby.addTo(game, config.getPlayers());
             game.listen(GameActivityEvents.REQUEST_START, waiting::requestStart);
             game.listen(GamePlayerEvents.ADD, waiting::addPlayer);
             game.listen(GamePlayerEvents.OFFER, JoinOffer::accept);

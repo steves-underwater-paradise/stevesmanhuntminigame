@@ -1,16 +1,57 @@
 package com.steveplays.stevesmanhuntminigame.game;
 
+import org.jetbrains.annotations.Nullable;
+import com.google.common.base.CaseFormat;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.steveplays.stevesmanhuntminigame.game.map.StevesManhuntMiniGameMapConfig;
+import net.minecraft.scoreboard.AbstractTeam.VisibilityRule;
 import xyz.nucleoid.plasmid.api.game.common.config.WaitingLobbyConfig;
 
-public record StevesManhuntMiniGameConfig(WaitingLobbyConfig players, StevesManhuntMiniGameMapConfig mapConfig, int timeLimitSeconds) {
-        public static final MapCodec<StevesManhuntMiniGameConfig> CODEC =
-                        RecordCodecBuilder.mapCodec(instance -> instance
-                                        .group(WaitingLobbyConfig.CODEC.fieldOf("players").forGetter(StevesManhuntMiniGameConfig::players),
-                                                        StevesManhuntMiniGameMapConfig.CODEC.fieldOf("map").forGetter(StevesManhuntMiniGameConfig::mapConfig),
-                                                        Codec.INT.fieldOf("time_limit_seconds").forGetter(StevesManhuntMiniGameConfig::timeLimitSeconds))
-                                        .apply(instance, StevesManhuntMiniGameConfig::new));
+public class StevesManhuntMiniGameConfig {
+    public static final MapCodec<StevesManhuntMiniGameConfig> CODEC =
+            RecordCodecBuilder.mapCodec(instance -> instance
+                    .group(WaitingLobbyConfig.CODEC.fieldOf("players").forGetter(StevesManhuntMiniGameConfig::getPlayers),
+                            StevesManhuntMiniGameMapConfig.CODEC.fieldOf("map").forGetter(StevesManhuntMiniGameConfig::getMapConfig),
+                            Codec.INT.fieldOf("time_limit_seconds").forGetter(StevesManhuntMiniGameConfig::getTimeLimitSeconds),
+                            Codec.STRING.fieldOf("player_name_tag_visibility").forGetter(StevesManhuntMiniGameConfig::getPlayerNameTagVisibilityRuleRaw))
+                    .apply(instance, StevesManhuntMiniGameConfig::new));
+
+    private WaitingLobbyConfig players;
+    private StevesManhuntMiniGameMapConfig mapConfig;
+    private int timeLimitSeconds;
+    private String playerNameTagVisibilityRuleRaw;
+    private @Nullable VisibilityRule playerNameTagVisibilityRule;
+
+    private StevesManhuntMiniGameConfig(WaitingLobbyConfig players, StevesManhuntMiniGameMapConfig mapConfig, int timeLimitSeconds, String playerNameTagVisibilityRuleRaw) {
+        this.players = players;
+        this.mapConfig = mapConfig;
+        this.timeLimitSeconds = timeLimitSeconds;
+        this.playerNameTagVisibilityRuleRaw = playerNameTagVisibilityRuleRaw;
+    }
+
+    public WaitingLobbyConfig getPlayers() {
+        return players;
+    }
+
+    public StevesManhuntMiniGameMapConfig getMapConfig() {
+        return mapConfig;
+    }
+
+    public int getTimeLimitSeconds() {
+        return timeLimitSeconds;
+    }
+
+    private String getPlayerNameTagVisibilityRuleRaw() {
+        return playerNameTagVisibilityRuleRaw;
+    }
+
+    public VisibilityRule getPlayerNameTagVisibilityRule() {
+        if (this.playerNameTagVisibilityRule == null) {
+            this.playerNameTagVisibilityRule = VisibilityRule.getRule(CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, this.getPlayerNameTagVisibilityRuleRaw()));
+        }
+
+        return this.playerNameTagVisibilityRule;
+    }
 }
