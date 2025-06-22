@@ -10,5 +10,5 @@
   },
   "time_limit_seconds": 14400,
   "player_name_tag_visibility": "always",
-  "hunters_team_ratio_percent": 20.0
+  "hunters_team_ratio_percent": 0.2
 }

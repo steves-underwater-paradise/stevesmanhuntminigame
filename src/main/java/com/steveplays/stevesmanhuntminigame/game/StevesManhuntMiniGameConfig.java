@@ -59,7 +59,7 @@ public class StevesManhuntMiniGameConfig {
         return this.playerNameTagVisibilityRule;
     }
 
-    private float getHuntersTeamRatioPercent() {
+    public float getHuntersTeamRatioPercent() {
         return huntersTeamRatioPercent;
     }
 }
