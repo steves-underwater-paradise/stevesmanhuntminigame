@@ -7,7 +7,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import xyz.nucleoid.plasmid.api.game.GameCloseReason;
 import xyz.nucleoid.plasmid.api.game.GameSpace;
-import xyz.nucleoid.plasmid.api.game.GameSpaceManager;
 import xyz.nucleoid.plasmid.api.game.common.GlobalWidgets;
 import xyz.nucleoid.plasmid.api.game.common.team.GameTeam;
 import xyz.nucleoid.plasmid.api.game.common.team.GameTeamConfig;
@@ -20,7 +19,6 @@ import xyz.nucleoid.plasmid.api.game.player.PlayerSet;
 import xyz.nucleoid.plasmid.api.game.rule.GameRuleType;
 import xyz.nucleoid.plasmid.api.util.PlayerRef;
 import net.minecraft.block.pattern.BlockPattern.Result;
-import net.minecraft.entity.EntityStatuses;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.particle.ParticleTypes;
@@ -41,7 +39,6 @@ import static com.steveplays.stevesmanhuntminigame.util.TickUtil.TICKS_PER_SECON
 import java.util.*;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.Nullable;
-import com.steveplays.stevesmanhuntminigame.StevesManhuntMiniGame;
 import com.steveplays.stevesmanhuntminigame.util.WinUtil;
 
 public class StevesManhuntMiniGameActive {
@@ -127,7 +124,7 @@ public class StevesManhuntMiniGameActive {
 
         var huntersTeamRatio = 0.2f;
         var random = Random.create();
-        for (int i = 0; i < (int) Math.round(participants.size() * huntersTeamRatio); i++) {
+        for (int i = 0; i < Math.clamp((int) Math.round(participants.size() * huntersTeamRatio), 1, Integer.MAX_VALUE); i++) {
             this.teamManager.addPlayerTo(participants.get(random.nextInt(participants.size())), this.hunterTeam.key());
         }
 
@@ -221,7 +218,7 @@ public class StevesManhuntMiniGameActive {
                 return;
         }
 
-        this.timerBar.update(this.stageManager.getFinishTime() - time, this.config.timeLimitSeconds() * TICKS_PER_SECOND);
+        this.timerBar.update(this.stageManager.getFinishTime() - time, this.config.timeLimitSeconds() * TICKS_PER_SECOND, this.teamManager, this.hunterTeam.key(), this.runnerTeam.key());
     }
 
     private void broadcastWin(WinUtil.WinResult winResult) {
