@@ -201,6 +201,7 @@ public class StevesManhuntMiniGameActive {
     }
 
     private void respawnParticipant(ServerPlayerEntity player, DamageSource damageSource) {
+        this.spawnLogic.resetPlayer(player, GameMode.SURVIVAL);
         this.spawnLogic.respawnPlayer(player);
         if (damageSource.getAttacker() != null) {
             player.getInventory().insertStack(Items.STONE_SWORD.getDefaultStack());
