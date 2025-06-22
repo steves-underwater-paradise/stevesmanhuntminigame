@@ -56,7 +56,7 @@ public class StevesManhuntMiniGameActive {
     private final TeamManager teamManager;
     private final GameTeam hunterTeam;
     private final GameTeam runnerTeam;
-    private final StevesManhuntMiniGameSideBar timerBar;
+    private final StevesManhuntMiniGameSidebar timerBar;
 
     private StevesManhuntMiniGameActive(GameSpace gameSpace, ServerWorld overworld, ServerWorld nether, ServerWorld end, GlobalWidgets widgets, TeamManager teamManager,
             StevesManhuntMiniGameConfig config, Set<PlayerRef> participants) {
@@ -83,7 +83,7 @@ public class StevesManhuntMiniGameActive {
         this.runnerTeam = new GameTeam(new GameTeamKey("runners"),
                 new GameTeamConfig(Text.literal("Runners"), GameTeamConfig.Colors.from(DyeColor.BLUE), true, CollisionRule.ALWAYS, VisibilityRule.ALWAYS, Text.empty(), Text.empty()));
 
-        this.timerBar = new StevesManhuntMiniGameSideBar(widgets);
+        this.timerBar = new StevesManhuntMiniGameSidebar(widgets);
     }
 
     public static void open(GameSpace gameSpace, ServerWorld overworld, ServerWorld nether, ServerWorld end, StevesManhuntMiniGameConfig config) {
@@ -200,6 +200,8 @@ public class StevesManhuntMiniGameActive {
 
     private void tick() {
         long time = this.overworld.getTime();
+        this.timerBar.update(this.stageManager.getFinishTime() - time, this.config.timeLimitSeconds() * TICKS_PER_SECOND, this.teamManager, this.hunterTeam.key(), this.runnerTeam.key());
+
         StevesManhuntMiniGameStageManager.IdleTickResult result =
                 this.stageManager.tick(time, this.gameSpace, this.teamManager, this.hunterTeam.key(), this.runnerTeam.key(), this.ignoreWinState, this.end);
         switch (result) {
@@ -217,8 +219,6 @@ public class StevesManhuntMiniGameActive {
                 this.gameSpace.close(GameCloseReason.FINISHED);
                 return;
         }
-
-        this.timerBar.update(this.stageManager.getFinishTime() - time, this.config.timeLimitSeconds() * TICKS_PER_SECOND, this.teamManager, this.hunterTeam.key(), this.runnerTeam.key());
     }
 
     private void broadcastWin(WinUtil.WinResult winResult) {

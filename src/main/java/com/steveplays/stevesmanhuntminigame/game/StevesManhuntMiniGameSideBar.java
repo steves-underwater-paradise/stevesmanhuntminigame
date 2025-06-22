@@ -27,7 +27,7 @@ import org.joml.Vector3f;
 // .█...............█
 // ..██...........██
 // ....███████████
-public final class StevesManhuntMiniGameSideBar {
+public final class StevesManhuntMiniGameSidebar {
     private static final @NotNull Text[] COMPASS = new Text[] {Text.literal("    ███"), Text.literal("  █      █"), Text.literal("█          █"), Text.literal("█    █    █"),
             Text.literal("█          █"), Text.literal("  █      █"), Text.literal("    ███")};
     private static final @NotNull Text[] COMPASS_NORTH = new Text[] {Text.literal("    ███"), Text.literal("  █  █  █"), Text.literal("█    █    █"), Text.literal("█    █    █"),
@@ -52,7 +52,7 @@ public final class StevesManhuntMiniGameSideBar {
     private Map<UUID, SidebarWidget> hunterSidebarWidgets = new HashMap<>();
     private SidebarWidget runnerSidebarWidget;
 
-    public StevesManhuntMiniGameSideBar(GlobalWidgets widgets) {
+    public StevesManhuntMiniGameSidebar(GlobalWidgets widgets) {
         this.waitingSidebarWidget = widgets.addSidebar(Text.literal("Manhunt"));
         waitingSidebarWidget.addLines(Text.literal("Waiting for the game to start..."));
     }
