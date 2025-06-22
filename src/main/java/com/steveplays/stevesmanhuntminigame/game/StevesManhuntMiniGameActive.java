@@ -20,7 +20,10 @@ import xyz.nucleoid.plasmid.api.game.rule.GameRuleType;
 import xyz.nucleoid.plasmid.api.util.PlayerRef;
 import net.minecraft.block.pattern.BlockPattern.Result;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemUsageContext;
+import net.minecraft.item.Items;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.scoreboard.AbstractTeam.CollisionRule;
 import net.minecraft.scoreboard.AbstractTeam.VisibilityRule;
@@ -200,6 +203,11 @@ public class StevesManhuntMiniGameActive {
 
     private void respawnParticipant(ServerPlayerEntity player) {
         this.spawnLogic.respawnPlayer(player);
+        player.getInventory().insertStack(Items.STONE_SWORD.getDefaultStack());
+        player.getInventory().insertStack(Items.STONE_PICKAXE.getDefaultStack());
+        player.getInventory().insertStack(Items.STONE_AXE.getDefaultStack());
+        player.getInventory().insertStack(Items.STONE_SHOVEL.getDefaultStack());
+        player.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 120, 1));
     }
 
     private void spawnSpectator(ServerPlayerEntity player) {
