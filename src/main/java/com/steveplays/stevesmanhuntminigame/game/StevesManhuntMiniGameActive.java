@@ -29,17 +29,21 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.DyeColor;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.GameMode;
 import xyz.nucleoid.stimuli.event.player.PlayerDeathEvent;
 import xyz.nucleoid.stimuli.event.world.EndPortalOpenEvent;
 import xyz.nucleoid.stimuli.event.world.NetherPortalOpenEvent;
-import static com.steveplays.stevesmanhuntminigame.util.TickUtil.TICKS_PER_SECOND;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.Nullable;
+import com.steveplays.stevesmanhuntminigame.util.TeamUtil;
 import com.steveplays.stevesmanhuntminigame.util.WinUtil;
+
+import static com.steveplays.stevesmanhuntminigame.StevesManhuntMiniGame.MOD_ID;
+import static com.steveplays.stevesmanhuntminigame.util.TickUtil.TICKS_PER_SECOND;
+import static com.steveplays.stevesmanhuntminigame.util.TeamUtil.HUNTERS_TEAM_ID;
+import static com.steveplays.stevesmanhuntminigame.util.TeamUtil.RUNNERS_TEAM_ID;
 
 public class StevesManhuntMiniGameActive {
     public final GameSpace gameSpace;
@@ -77,13 +81,12 @@ public class StevesManhuntMiniGameActive {
         this.widgets = widgets;
         this.teamManager = teamManager;
 
-        // TODO: Replace literal text with translatable text
-        this.hunterTeam = new GameTeam(new GameTeamKey("hunters"), new GameTeamConfig(Text.literal("Hunters"), GameTeamConfig.Colors.from(DyeColor.RED), true, CollisionRule.ALWAYS,
-                VisibilityRule.ALWAYS, Text.literal("[Hunter] ").styled(style -> style.withColor(Formatting.RED)), Text.empty()));
-        this.runnerTeam = new GameTeam(new GameTeamKey("runners"),
-                new GameTeamConfig(Text.literal("Runners"), GameTeamConfig.Colors.from(DyeColor.BLUE), true, CollisionRule.ALWAYS, VisibilityRule.ALWAYS, Text.empty(), Text.empty()));
+        this.hunterTeam = new GameTeam(new GameTeamKey(HUNTERS_TEAM_ID), new GameTeamConfig(TeamUtil.getTeamNameStyled(HUNTERS_TEAM_ID), TeamUtil.getColorForTeam(HUNTERS_TEAM_ID), true,
+                CollisionRule.ALWAYS, VisibilityRule.ALWAYS, TeamUtil.getTeamNamePrefixStyled(HUNTERS_TEAM_ID).copy().append(" "), Text.empty()));
+        this.runnerTeam = new GameTeam(new GameTeamKey(RUNNERS_TEAM_ID), new GameTeamConfig(TeamUtil.getTeamNameStyled(RUNNERS_TEAM_ID), TeamUtil.getColorForTeam(RUNNERS_TEAM_ID), true,
+                CollisionRule.ALWAYS, VisibilityRule.ALWAYS, Text.empty(), Text.empty()));
 
-        this.timerBar = new StevesManhuntMiniGameSidebar(widgets);
+        this.timerBar = new StevesManhuntMiniGameSidebar();
     }
 
     public static void open(GameSpace gameSpace, ServerWorld overworld, ServerWorld nether, ServerWorld end, StevesManhuntMiniGameConfig config) {
@@ -131,7 +134,6 @@ public class StevesManhuntMiniGameActive {
         for (var participant : this.gameSpace.getPlayers().participants()) {
             if (this.teamManager.teamFor(participant) == null) {
                 this.teamManager.addPlayerTo(participant, this.runnerTeam.key());
-                participant.setCustomName(Text.literal("Runner").styled(style -> style.withColor(Formatting.BLUE)));
             }
 
             this.spawnParticipant(participant);
@@ -225,9 +227,9 @@ public class StevesManhuntMiniGameActive {
         @Nullable var winningGameTeamKey = winResult.getWinningTeamKey();
         Text message;
         if (winningGameTeamKey != null) {
-            message = this.teamManager.getTeamConfig(winningGameTeamKey).name().copy().append(" have won the game!").formatted(Formatting.GOLD);
+            message = Text.translatable(String.format("%s.game_ended_with_winner", MOD_ID), this.teamManager.getTeamConfig(winningGameTeamKey).name()).formatted(Formatting.GOLD);
         } else {
-            message = Text.literal("The game ended, but nobody won!").formatted(Formatting.GOLD);
+            message = Text.translatable(String.format("%s.game_ended_without_winner", MOD_ID)).formatted(Formatting.GOLD);
         }
 
         PlayerSet players = this.gameSpace.getPlayers();

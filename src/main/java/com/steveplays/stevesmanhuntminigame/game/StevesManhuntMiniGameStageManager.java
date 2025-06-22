@@ -1,6 +1,8 @@
 package com.steveplays.stevesmanhuntminigame.game;
 
 import com.google.common.collect.ImmutableSet;
+import com.steveplays.stevesmanhuntminigame.util.PlayerUtil;
+import com.steveplays.stevesmanhuntminigame.util.TeamUtil;
 import com.steveplays.stevesmanhuntminigame.util.WinUtil;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -16,15 +18,16 @@ import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec3d;
+
+import static com.steveplays.stevesmanhuntminigame.StevesManhuntMiniGame.MOD_ID;
 import static com.steveplays.stevesmanhuntminigame.util.TickUtil.TICKS_PER_SECOND;
 import static com.steveplays.stevesmanhuntminigame.util.TickUtil.TICKS_PER_SECOND_FLOAT;
-import org.jetbrains.annotations.NotNull;
+import static com.steveplays.stevesmanhuntminigame.util.TeamUtil.HUNTERS_TEAM_ID;
+import static com.steveplays.stevesmanhuntminigame.util.TeamUtil.RUNNERS_TEAM_ID;
 
 public class StevesManhuntMiniGameStageManager {
     private static final int START_COUNTDOWN_LENGTH_SECONDS = 5;
     private static final int ROLE_REVEAL_LENGTH_SECONDS = 10;
-    private static final @NotNull String HUNTER_DESCRIPTION = "Eliminate all Runners before they kill the Ender Dragon to win.";
-    private static final @NotNull String RUNNER_DESCRIPTION = "Kill the Ender Dragon while avoiding Hunters, who are trying to kill you.";
 
     private final Object2ObjectMap<ServerPlayerEntity, FrozenPlayer> frozen;
 
@@ -95,36 +98,43 @@ public class StevesManhuntMiniGameStageManager {
             return;
         }
 
+        var timeUntilRoleRevealEndFloored = (int) Math.floor((this.roleRevealEndTime - time) / TICKS_PER_SECOND_FLOAT) - 1;
         PlayerSet participants = space.getPlayers().participants();
         for (var participant : participants) {
             if (timeUntilStartSecondsFloored > 0) {
-                var timeUntilRoleRevealEndFloored = (int) Math.floor((this.roleRevealEndTime - time) / TICKS_PER_SECOND_FLOAT) - 1;
-                var playerTeamKey = teamManager.teamFor(participant);
-                var playerIsHunter = playerTeamKey.equals(hunterTeamKey);
+                var participantTeamKey = teamManager.teamFor(participant);
+                var participantIsHunter = participantTeamKey.equals(hunterTeamKey);
                 if (hasRevealedRoles) {
                     if (timeUntilRoleRevealEndFloored > 0) {
-                        if (playerIsHunter) {
-                            participant.sendMessage(Text.literal("Infinite respawns"), true);
+                        if (participantIsHunter) {
+                            participant.sendMessage(Text.translatable(String.format("%s.infinite_respawns", MOD_ID)), true);
                         } else {
-                            participant.sendMessage(Text.literal("No respawns"), true);
+                            participant.sendMessage(Text.translatable(String.format("%s.no_respawns", MOD_ID)), true);
                         }
                         continue;
                     }
 
-                    participants.showTitle(Text.literal(Integer.toString(timeUntilStartSecondsFloored)).formatted(Formatting.BOLD), Text.empty(), 5, TICKS_PER_SECOND - 5, 0);
-                    participants.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.PLAYERS, 0.5f, 1.0f);
+                    PlayerUtil.showTitle(participant, Text.literal(Integer.toString(timeUntilStartSecondsFloored)).formatted(Formatting.BOLD), Text.empty(), 5, TICKS_PER_SECOND - 5, 0);
+                    participant.playSoundToPlayer(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.PLAYERS, 0.5f, 1.0f);
                     continue;
                 }
 
-                participants.showTitle(Text.literal(String.format("You are a %s.", teamManager.getTeamConfig(playerTeamKey).name().getString())).formatted(Formatting.BOLD),
-                        Text.literal(playerIsHunter ? HUNTER_DESCRIPTION : RUNNER_DESCRIPTION), 5, ROLE_REVEAL_LENGTH_SECONDS * TICKS_PER_SECOND - 5, 0);
-                participants.playSound(SoundEvents.BLOCK_NOTE_BLOCK_CHIME.value(), SoundCategory.PLAYERS, 0.5f, 0.5f);
+                PlayerUtil.showTitle(participant,
+                        (Text.translatable(String.format("%s.your_role", MOD_ID)).append(" ").append(TeamUtil.getTeamNamePrefixStyled(teamManager.teamFor(participant).id())).append("."))
+                                .formatted(Formatting.BOLD),
+                        participantIsHunter
+                                ? Text.translatable(String.format("%s.team.%s.description_0", MOD_ID, HUNTERS_TEAM_ID)).append(" ").append(TeamUtil.getTeamNameStyled(RUNNERS_TEAM_ID)).append(" ")
+                                        .append(Text.translatable(String.format("%s.team.%s.description_1", MOD_ID, HUNTERS_TEAM_ID)))
+                                : Text.translatable(String.format("%s.team.%s.description_0", MOD_ID, RUNNERS_TEAM_ID)).append(" ").append(TeamUtil.getTeamNameStyled(HUNTERS_TEAM_ID)).append(" ")
+                                        .append(Text.translatable(String.format("%s.team.%s.description_1", MOD_ID, RUNNERS_TEAM_ID))),
+                        5, ROLE_REVEAL_LENGTH_SECONDS * TICKS_PER_SECOND - 5, 0);
+                participant.playSoundToPlayer(SoundEvents.BLOCK_NOTE_BLOCK_CHIME.value(), SoundCategory.PLAYERS, 0.5f, 0.5f);
                 hasRevealedRoles = true;
                 continue;
             }
 
-            participants.showTitle(Text.literal("Go!").formatted(Formatting.BOLD), Text.empty(), 5, TICKS_PER_SECOND - 5, 0);
-            participants.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.PLAYERS, 0.5f, 2.0f);
+            PlayerUtil.showTitle(participant, Text.translatable(String.format("%s.go", MOD_ID)).formatted(Formatting.BOLD), Text.empty(), 5, TICKS_PER_SECOND - 5, 0);
+            participant.playSoundToPlayer(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.PLAYERS, 0.5f, 2.0f);
         }
 
     }

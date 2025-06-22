@@ -9,13 +9,18 @@ import xyz.nucleoid.plasmid.api.game.common.team.GameTeamKey;
 import xyz.nucleoid.plasmid.api.game.common.team.TeamManager;
 import xyz.nucleoid.plasmid.api.game.common.widget.SidebarWidget;
 
-import static com.steveplays.stevesmanhuntminigame.util.TickUtil.TICKS_PER_SECOND;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
+import com.steveplays.stevesmanhuntminigame.util.TeamUtil;
+
+import static com.steveplays.stevesmanhuntminigame.StevesManhuntMiniGame.MOD_ID;
+import static com.steveplays.stevesmanhuntminigame.util.TickUtil.TICKS_PER_SECOND;
+import static com.steveplays.stevesmanhuntminigame.util.TeamUtil.HUNTERS_TEAM_ID;
+import static com.steveplays.stevesmanhuntminigame.util.TeamUtil.RUNNERS_TEAM_ID;
 
 // Compass ASCII art (remove periods; without direction indicator):
 // ....███████████
@@ -28,6 +33,7 @@ import org.joml.Vector3f;
 // ..██...........██
 // ....███████████
 public final class StevesManhuntMiniGameSidebar {
+    private static final @NotNull Text SIDEBAR_WIDGET_TITLE = Text.translatable("gametype.stevesmanhuntminigame.stevesmanhuntminigame").styled(style -> style.withBold(true));
     private static final @NotNull Text[] COMPASS = new Text[] {Text.literal("    ███"), Text.literal("  █      █"), Text.literal("█          █"), Text.literal("█    █    █"),
             Text.literal("█          █"), Text.literal("  █      █"), Text.literal("    ███")};
     private static final @NotNull Text[] COMPASS_NORTH = new Text[] {Text.literal("    ███"), Text.literal("  █  █  █"), Text.literal("█    █    █"), Text.literal("█    █    █"),
@@ -47,23 +53,19 @@ public final class StevesManhuntMiniGameSidebar {
     private static final @NotNull Text[] COMPASS_NORTH_WEST = new Text[] {Text.literal("    ███"), Text.literal("  █      █"), Text.literal("█  █      █"), Text.literal("█    █    █"),
             Text.literal("█      █  █"), Text.literal("  █      █"), Text.literal("    ███")};
 
-    private final SidebarWidget waitingSidebarWidget;
-
     private Map<UUID, SidebarWidget> hunterSidebarWidgets = new HashMap<>();
     private SidebarWidget runnerSidebarWidget;
 
-    public StevesManhuntMiniGameSidebar(GlobalWidgets widgets) {
-        this.waitingSidebarWidget = widgets.addSidebar(Text.literal("Manhunt"));
-        waitingSidebarWidget.addLines(Text.literal("Waiting for the game to start..."));
+    public StevesManhuntMiniGameSidebar() {
+        // NO-OP
     }
 
     public void onOpen(GlobalWidgets widgets, TeamManager teamManager, GameTeamKey hunterTeamKey, GameTeamKey runnerTeamKey) {
-        // TODO: Replace literal text with translatable text
         for (var hunter : teamManager.playersIn(hunterTeamKey)) {
-            var hunterSideBarWidget = widgets.addSidebar(Text.literal("Manhunt"), participant -> participant.getUuid().equals(hunter.getUuid()));
+            var hunterSideBarWidget = widgets.addSidebar(SIDEBAR_WIDGET_TITLE, participant -> participant.getUuid().equals(hunter.getUuid()));
             hunterSidebarWidgets.put(hunter.getUuid(), hunterSideBarWidget);
         }
-        this.runnerSidebarWidget = widgets.addSidebar(Text.literal("Manhunt"), participant -> teamManager.teamFor(participant).equals(runnerTeamKey));
+        this.runnerSidebarWidget = widgets.addSidebar(SIDEBAR_WIDGET_TITLE, participant -> teamManager.teamFor(participant).equals(runnerTeamKey));
     }
 
     public void update(long ticksUntilEnd, long totalTicksUntilEnd, TeamManager teamManager, GameTeamKey hunterTeamKey, GameTeamKey runnerTeamKey) {
@@ -71,8 +73,8 @@ public final class StevesManhuntMiniGameSidebar {
         for (var hunter : teamManager.playersIn(hunterTeamKey)) {
             var hunterSidebarWidget = hunterSidebarWidgets.get(hunter.getUuid());
             hunterSidebarWidget.clearLines();
-            hunterSidebarWidget.addLines(Text.literal("Your team: Hunters"));
-            hunterSidebarWidget.addLines(Text.literal("Time remaining: ").append(this.getText(ticksUntilEnd)));
+            hunterSidebarWidget.addLines(Text.translatable(String.format("%s.your_role", MOD_ID)).append(" ").append(TeamUtil.getTeamNamePrefixStyled(HUNTERS_TEAM_ID)).append("."));
+            hunterSidebarWidget.addLines(Text.translatable(String.format("%s.time_remaining", MOD_ID)).append(": ").append(this.getText(ticksUntilEnd)));
 
             var runners = teamManager.playersIn(runnerTeamKey);
             if (runners.stream().anyMatch(runner -> !runner.isSpectator() && runner.getServerWorld().getRegistryKey().equals(hunter.getServerWorld().getRegistryKey()))) {
@@ -93,8 +95,13 @@ public final class StevesManhuntMiniGameSidebar {
                     return;
                 }
 
-                hunterSidebarWidget.addLines(Text.literal(""), Text.literal("Closest Runner:"),
-                        Text.literal(String.format("- Distance: %.2f m", closestRunnerDistance)).styled(style -> style.withColor(Formatting.GRAY)), Text.literal("- Direction:"));
+                hunterSidebarWidget.addLines(Text.literal(""),
+                        Text.translatable(String.format("%s.closest", MOD_ID)).append(" ").append(TeamUtil.getTeamNamePrefixStyled(teamManager.teamFor(closestRunner).id())).append(": ")
+                                .append(closestRunner.getDisplayName()),
+                        Text.literal("- ").append(Text.translatable(String.format("%s.distance", MOD_ID)))
+                                .append((Text.literal(String.format(": %.2f", closestRunnerDistance)).append(" ").append(Text.translatable(String.format("%s.meters_suffix", MOD_ID))))
+                                        .styled(style -> style.withColor(Formatting.GRAY))),
+                        Text.literal("- ").append(Text.translatable(String.format("%s.direction", MOD_ID))).append(":"));
                 var closestRunnerPosition = closestRunner.getPos();
                 var directionToRunner = new Vec3d(closestRunnerPosition.x, hunter.getY(), closestRunnerPosition.z).subtract(hunter.getPos());
                 var hunterForward = hunter.getRotationVector().toVector3f();
@@ -104,13 +111,13 @@ public final class StevesManhuntMiniGameSidebar {
                         - ((Math.toDegrees(new Vector3f(-hunterForward.x(), -hunterForward.y(), -hunterForward.z()).angleSigned(directionToRunner.normalize().toVector3f(), hunterUp)) + 180d) / 360d));
                 hunterSidebarWidget.addLines(getCompassWithDirectionIndicator(directionToRunnerAngle));
             } else {
-                hunterSidebarWidget.addLines(Text.literal("All runners are in another dimension."));
+                hunterSidebarWidget.addLines(Text.translatable("all_enemy_players_are_in_another_dimension", TeamUtil.getTeamNamePrefixStyled(RUNNERS_TEAM_ID)));
             }
         }
 
         runnerSidebarWidget.clearLines();
-        runnerSidebarWidget.addLines(Text.literal("Your team: Runners"));
-        runnerSidebarWidget.addLines(Text.literal("Time remaining: ").append(this.getText(ticksUntilEnd)));
+        runnerSidebarWidget.addLines(Text.translatable(String.format("%s.your_role", MOD_ID)).append(" ").append(TeamUtil.getTeamNamePrefixStyled(RUNNERS_TEAM_ID)).append("."));
+        runnerSidebarWidget.addLines(Text.translatable(String.format("%s.time_remaining", MOD_ID)).append(": ").append(this.getText(ticksUntilEnd)));
     }
 
     private Text getText(long ticksUntilEnd) {
