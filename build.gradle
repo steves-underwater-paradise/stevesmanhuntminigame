@@ -20,6 +20,17 @@ repositories {
         name = "Nucleoid"
         url = "https://maven.nucleoid.xyz/"
     }
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
     flatDir {
         dir rootProject.file("libraries/")
     }
@@ -42,6 +53,8 @@ dependencies {
     modImplementation("xyz.nucleoid:server-translations-api:${project.server_translations_api_version}")
     modImplementation("me.lucko:fabric-permissions-api:${project.fabric_permissions_api_version}")
     modImplementation("blank:plasmid-${project.plasmid_version}")
+
+    modCompileOnly("maven.modrinth:iris:1.8.8+1.21.1-fabric")
 }
 
 processResources {
